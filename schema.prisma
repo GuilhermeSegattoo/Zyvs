@@ -1,0 +1,698 @@
+// =====================================================
+// ZYVA - Schema do Banco de Dados (PostgreSQL + Prisma)
+// =====================================================
+//
+// Versão: 1.0.0
+// Última atualização: 2025-01-11
+//
+// Principais mudanças do schema Supabase:
+// - Sistema de ROLES (ADMIN vs LOJA)
+// - Multi-tenancy com Organizations
+// - Simplificação de 19 → 12 tabelas
+// - Otimizado para Prisma
+// - Adicionadas: Campanhas, Aniversários, Posts Sociais
+// - Removidas: Transactions, Coupons (features futuras)
+// =====================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================================================
+// AUTENTICAÇÃO E USUÁRIOS
+// =====================================================
+
+enum UserRole {
+  ADMIN  // Acesso total ao sistema (gerencia todas as orgs)
+  LOJA   // Usuário cliente (pertence a uma organização)
+}
+
+enum Plan {
+  FREE
+  PRO
+  BUSINESS
+  ENTERPRISE
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String    // Hash bcrypt
+  name          String
+  avatar        String?
+
+  // Role e permissões
+  role          UserRole  @default(LOJA)
+
+  // Organização (apenas para role LOJA)
+  organizationId String?
+  organization   Organization? @relation("OrganizationMembers", fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Para usuários LOJA - limites do plano
+  plan          Plan?     @default(FREE)
+  planExpiry    DateTime?
+
+  // Limites atuais (reset mensal)
+  messagesUsedThisMonth   Int @default(0)
+  flowExecutionsThisMonth Int @default(0)
+
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Onboarding
+  onboardingCompleted Boolean @default(false)
+
+  // Relações quando é OWNER de uma org
+  ownedOrganizations Organization[] @relation("OrganizationOwner")
+
+  // Relações de auditoria
+  auditLogs     AuditLog[]
+
+  // Relações de criação
+  createdFlows     Flow[]
+  createdCampaigns Campaign[]
+
+  @@index([email])
+  @@index([role])
+  @@index([organizationId])
+  @@map("users")
+}
+
+// =====================================================
+// ORGANIZAÇÕES (MULTI-TENANCY)
+// =====================================================
+
+model Organization {
+  id          String   @id @default(cuid())
+
+  // Owner (criador da organização)
+  ownerId     String
+  owner       User     @relation("OrganizationOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  // Dados da organização
+  name        String
+  slug        String   @unique  // URL-friendly
+  logo        String?
+  email       String?
+  phone       String?
+  website     String?
+
+  // Segmento de negócio
+  businessSegment String?
+  description     String?  @db.Text
+
+  // Endereço (JSON)
+  address     Json?
+
+  // Status
+  isActive    Boolean  @default(true)
+
+  // Plano e limites (herdado do owner, mas pode ser customizado)
+  plan            Plan    @default(FREE)
+  maxContacts     Int     @default(100)
+  maxFlows        Int     @default(3)
+  maxMessagesPerMonth Int @default(500)
+
+  // Uso atual (atualizado em tempo real)
+  currentContacts Int     @default(0)
+  currentFlows    Int     @default(0)
+  messagesThisMonth Int   @default(0)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relações
+  members     User[]   @relation("OrganizationMembers")
+  contacts    Contact[]
+  tags        Tag[]
+  kanbanColumns KanbanColumn[]
+  flows       Flow[]
+  campaigns   Campaign[]
+  messages    Message[]
+  integrations Integration[]
+  birthdayAutomation BirthdayAutomation?
+
+  @@index([ownerId])
+  @@index([slug])
+  @@index([isActive])
+  @@map("organizations")
+}
+
+// =====================================================
+// CONTATOS (CRM)
+// =====================================================
+
+enum ContactStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+model Contact {
+  id              String        @id @default(cuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Dados pessoais
+  name            String
+  email           String?
+  phone           String?
+  avatar          String?
+
+  // Data de nascimento (para automação de aniversários)
+  birthdate       DateTime?     @db.Date
+
+  // Dados adicionais
+  gender          String?
+  cpf             String?
+  address         Json?         // { street, city, state, zip, country }
+
+  // Informações de negócio
+  dealValue       Decimal?      @db.Decimal(10, 2)
+  source          String?       // De onde veio (landing page, indicação, etc)
+  notes           String?       @db.Text
+
+  // Status
+  status          ContactStatus @default(ACTIVE)
+
+  // Estatísticas
+  lastInteraction DateTime?
+  interactionCount Int          @default(0)
+  totalSpent      Decimal       @default(0) @db.Decimal(10, 2)
+  ordersCount     Int           @default(0)
+
+  // Kanban (Pipeline)
+  kanbanColumnId  String?
+  kanbanColumn    KanbanColumn? @relation(fields: [kanbanColumnId], references: [id], onDelete: SetNull)
+
+  // Campos customizados (JSON flexível)
+  customFields    Json?
+
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relações
+  tags            Tag[]
+  messages        Message[]
+  flowExecutions  FlowExecution[]
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, email])
+  @@index([organizationId, phone])
+  @@index([birthdate])  // Para query de aniversariantes
+  @@index([kanbanColumnId])
+  @@map("contacts")
+}
+
+// =====================================================
+// TAGS (Segmentação)
+// =====================================================
+
+model Tag {
+  id              String       @id @default(cuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name            String
+  color           String       @default("#8b5cf6")  // Roxo padrão
+  description     String?
+
+  isActive        Boolean      @default(true)
+
+  // Timestamps
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relações
+  contacts        Contact[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("tags")
+}
+
+// =====================================================
+// KANBAN (PIPELINE DE VENDAS)
+// =====================================================
+
+model KanbanColumn {
+  id              String       @id @default(cuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name            String
+  color           String       @default("#3b82f6")  // Azul padrão
+  order           Int          // Ordem de exibição (0, 1, 2...)
+
+  isDefault       Boolean      @default(false)  // Coluna padrão para novos contatos
+  isFinal         Boolean      @default(false)  // Coluna final (ganhou/perdeu)
+  isActive        Boolean      @default(true)
+
+  // Timestamps
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relações
+  contacts        Contact[]
+
+  @@unique([organizationId, order])
+  @@index([organizationId])
+  @@map("kanban_columns")
+}
+
+// =====================================================
+// FLOW BUILDER (AUTOMAÇÕES)
+// =====================================================
+
+enum FlowStatus {
+  ACTIVE
+  INACTIVE
+  DRAFT
+}
+
+model Flow {
+  id              String       @id @default(cuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name            String
+  description     String?
+  category        String?      // Ex: "Pós-venda", "Captação", "Retenção"
+
+  // Configuração do flow (JSON)
+  nodes           Json         @default("[]")  // Array de nós
+  edges           Json         @default("[]")  // Conexões entre nós
+
+  // Status
+  status          FlowStatus   @default(DRAFT)
+
+  // Estatísticas
+  lastExecution   DateTime?
+  executionCount  Int          @default(0)
+  successCount    Int          @default(0)
+  errorCount      Int          @default(0)
+
+  // Template
+  isTemplate      Boolean      @default(false)
+
+  // Timestamps
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  createdBy       String?
+  createdByUser   User?        @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+
+  // Relações
+  executions      FlowExecution[]
+
+  @@index([organizationId, status])
+  @@map("flows")
+}
+
+enum FlowExecutionStatus {
+  RUNNING
+  PAUSED
+  COMPLETED
+  FAILED
+}
+
+model FlowExecution {
+  id              String              @id @default(cuid())
+  flowId          String
+  flow            Flow                @relation(fields: [flowId], references: [id], onDelete: Cascade)
+
+  contactId       String
+  contact         Contact             @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  // Estado da execução
+  currentNodeId   String?             // ID do nó atual no flow
+  status          FlowExecutionStatus @default(RUNNING)
+
+  // Logs e tracking
+  executionLog    Json                @default("[]")  // Array de steps executados
+  errorMessage    String?             @db.Text
+
+  // Métricas
+  nodesExecuted   Int                 @default(0)
+
+  // Timestamps
+  startedAt       DateTime            @default(now())
+  completedAt     DateTime?
+
+  @@index([flowId, status])
+  @@index([contactId])
+  @@map("flow_executions")
+}
+
+// =====================================================
+// CAMPANHAS (MENSAGENS E POSTS SOCIAIS)
+// =====================================================
+
+enum CampaignType {
+  MESSAGE      // Mensagem para contatos (WhatsApp/Email/SMS)
+  SOCIAL_POST  // Post em rede social (Instagram/Facebook)
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  FAILED
+}
+
+enum MessageChannel {
+  WHATSAPP
+  EMAIL
+  SMS
+  INSTAGRAM_DM
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  FACEBOOK
+  TWITTER
+  LINKEDIN
+}
+
+model Campaign {
+  id              String         @id @default(cuid())
+  organizationId  String
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Configuração
+  name            String
+  type            CampaignType
+
+  // Para MESSAGE
+  channel         MessageChannel?
+
+  // Para SOCIAL_POST
+  platform        SocialPlatform?
+
+  // Conteúdo
+  content         String         @db.Text
+  mediaUrl        String?        // URL da imagem/vídeo
+
+  // Segmentação (para MESSAGE)
+  targetAll       Boolean        @default(true)
+  targetTagIds    String[]       // Array de IDs de tags
+
+  // Agendamento
+  status          CampaignStatus @default(DRAFT)
+  scheduledFor    DateTime?
+
+  // Vinculação com Flow (opcional)
+  linkedToFlow    Boolean        @default(false)
+  flowId          String?
+
+  // Métricas
+  totalTargeted   Int            @default(0)  // Quantos contatos no alvo
+  totalSent       Int            @default(0)  // Quantos enviados
+  totalDelivered  Int            @default(0)  // Quantos entregues
+  totalOpened     Int            @default(0)  // Quantos abertos
+  totalClicked    Int            @default(0)  // Quantos clicaram
+  totalFailed     Int            @default(0)  // Quantos falharam
+
+  // Timestamps
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  sentAt          DateTime?
+  createdBy       String?
+  createdByUser   User?          @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+
+  // Relações
+  messages        Message[]
+
+  @@index([organizationId, status])
+  @@index([scheduledFor])
+  @@map("campaigns")
+}
+
+// =====================================================
+// MENSAGENS (HISTÓRICO E AGENDAMENTO)
+// =====================================================
+
+enum MessageStatus {
+  PENDING      // Aguardando envio
+  QUEUED       // Na fila do BullMQ
+  SENDING      // Sendo enviado
+  SENT         // Enviado com sucesso
+  DELIVERED    // Entregue (confirmação do provedor)
+  READ         // Lido pelo destinatário
+  FAILED       // Falhou
+}
+
+model Message {
+  id              String        @id @default(cuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  contactId       String
+  contact         Contact       @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  // Origem da mensagem
+  campaignId      String?
+  campaign        Campaign?     @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  flowExecutionId String?
+  flowExecution   FlowExecution? @relation(fields: [flowExecutionId], references: [id], onDelete: SetNull)
+
+  // Conteúdo
+  channel         MessageChannel
+  content         String        @db.Text
+  mediaUrl        String?
+
+  // Agendamento
+  scheduledFor    DateTime?     // Null = enviar imediatamente
+
+  // Status e tracking
+  status          MessageStatus @default(PENDING)
+  errorMessage    String?       @db.Text
+
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  sentAt          DateTime?
+  deliveredAt     DateTime?
+  openedAt        DateTime?
+  clickedAt       DateTime?
+  failedAt        DateTime?
+
+  // ID externo do provedor (WhatsApp, SendGrid, etc)
+  externalId      String?
+
+  // Metadata adicional
+  metadata        Json?
+
+  @@index([organizationId, createdAt])
+  @@index([contactId, createdAt])
+  @@index([campaignId])
+  @@index([flowExecutionId])
+  @@index([status, scheduledFor])  // Para processar fila
+  @@map("messages")
+}
+
+// Relação de mensagens em FlowExecution
+model FlowExecution {
+  // ... campos existentes ...
+  messages Message[]
+}
+
+// =====================================================
+// INTEGRAÇÕES (APIs EXTERNAS)
+// =====================================================
+
+enum IntegrationType {
+  WHATSAPP_BUSINESS  // WhatsApp Cloud API ou Evolution API
+  INSTAGRAM          // Instagram Graph API
+  FACEBOOK           // Facebook Graph API
+  SENDGRID           // Email
+  RESEND             // Email (alternativa)
+  TWILIO             // SMS
+  SHOPIFY            // E-commerce (futuro)
+}
+
+model Integration {
+  id              String           @id @default(cuid())
+  organizationId  String
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  type            IntegrationType
+
+  // Status
+  isActive        Boolean          @default(true)
+  isConnected     Boolean          @default(false)
+
+  // Credenciais (ENCRIPTADAS!)
+  credentials     Json             // { apiKey, apiSecret, token, etc }
+
+  // Configurações específicas
+  config          Json?            // Configurações adicionais por tipo
+
+  // Webhook (para receber updates)
+  webhookUrl      String?
+  webhookSecret   String?
+
+  // Sincronização
+  lastSyncAt      DateTime?
+  lastError       String?          @db.Text
+
+  // Timestamps
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([organizationId, type])  // Uma integração de cada tipo por org
+  @@index([organizationId])
+  @@map("integrations")
+}
+
+// =====================================================
+// AUTOMAÇÃO DE ANIVERSÁRIOS
+// =====================================================
+
+model BirthdayAutomation {
+  id              String           @id @default(cuid())
+  organizationId  String           @unique
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Configuração
+  isEnabled       Boolean          @default(true)
+  template        String           @db.Text  // "Feliz aniversário {{nome}}! 🎉"
+  channel         MessageChannel   @default(WHATSAPP)
+  sendAtHour      Int              @default(9)  // Hora do dia (0-23)
+
+  // Estatísticas
+  totalSent       Int              @default(0)
+  lastSentAt      DateTime?
+
+  // Timestamps
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("birthday_automations")
+}
+
+// =====================================================
+// AUDITORIA E LOGS
+// =====================================================
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+}
+
+model AuditLog {
+  id              String       @id @default(cuid())
+
+  // Usuário que executou
+  userId          String?
+  user            User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userName        String?      // Cache do nome (caso usuário seja deletado)
+  userRole        UserRole?
+
+  // Ação
+  action          AuditAction
+  tableName       String       // Ex: "contacts", "flows"
+  recordId        String?      // ID do registro afetado
+
+  // Dados (antes/depois)
+  oldData         Json?
+  newData         Json?
+  changedFields   String[]     // Campos que mudaram
+
+  // Contexto
+  ipAddress       String?
+  userAgent       String?
+  metadata        Json?
+
+  // Timestamp
+  createdAt       DateTime     @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@index([tableName, recordId])
+  @@map("audit_logs")
+}
+
+// =====================================================
+// FUNÇÕES E TRIGGERS (PostgreSQL)
+// =====================================================
+
+// Trigger para atualizar updated_at automaticamente
+// CREATE OR REPLACE FUNCTION update_updated_at_column()
+// RETURNS TRIGGER AS $$
+// BEGIN
+//     NEW.updated_at = NOW();
+//     RETURN NEW;
+// END;
+// $$ language 'plpgsql';
+
+// Aplicar em todas as tabelas:
+// CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
+//     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+// =====================================================
+// ÍNDICES COMPOSTOS ADICIONAIS (Performance)
+// =====================================================
+
+// Contact.birthdate index para query eficiente de aniversariantes:
+// CREATE INDEX idx_contacts_birthday_month_day
+//     ON contacts (EXTRACT(MONTH FROM birthdate), EXTRACT(DAY FROM birthdate));
+
+// Message.scheduledFor para processar fila:
+// CREATE INDEX idx_messages_queue
+//     ON messages (status, scheduled_for)
+//     WHERE status IN ('PENDING', 'QUEUED');
+
+// =====================================================
+// VIEWS ÚTEIS (PostgreSQL)
+// =====================================================
+
+// View de estatísticas por organização
+// CREATE VIEW organization_stats AS
+// SELECT
+//     o.id,
+//     o.name,
+//     COUNT(DISTINCT c.id) as total_contacts,
+//     COUNT(DISTINCT f.id) as total_flows,
+//     COUNT(DISTINCT m.id) as total_messages,
+//     SUM(CASE WHEN m.created_at >= date_trunc('month', CURRENT_DATE) THEN 1 ELSE 0 END) as messages_this_month
+// FROM organizations o
+// LEFT JOIN contacts c ON c.organization_id = o.id
+// LEFT JOIN flows f ON f.organization_id = o.id
+// LEFT JOIN messages m ON m.organization_id = o.id
+// GROUP BY o.id, o.name;
+
+// =====================================================
+// RESUMO DO SCHEMA
+// =====================================================
+//
+// 📊 Total de Tabelas: 12
+//
+// 1. users                 - Autenticação e perfis
+// 2. organizations         - Multi-tenancy (lojas/empresas)
+// 3. contacts              - CRM de clientes
+// 4. tags                  - Segmentação de contatos
+// 5. kanban_columns        - Pipeline de vendas
+// 6. flows                 - Automações (flow builder)
+// 7. flow_executions       - Histórico de execuções
+// 8. campaigns             - Campanhas de mensagens/posts
+// 9. messages              - Histórico de mensagens
+// 10. integrations         - APIs externas
+// 11. birthday_automations - Config de aniversários
+// 12. audit_logs           - Auditoria completa
+//
+// =====================================================
