@@ -13,8 +13,10 @@ const fastify = Fastify({
 fastify.register(cors, {
   origin: process.env.NODE_ENV === 'production'
     ? process.env.FRONTEND_URL || 'https://seudominio.com'
-    : ['http://localhost:3000', 'http://localhost:3001'],
+    : true, // Aceita qualquer origem em desenvolvimento
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 });
 
 fastify.register(helmet, {
