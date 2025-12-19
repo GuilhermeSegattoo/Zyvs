@@ -41,6 +41,8 @@ export default function LoginPage() {
       const { user, token } = response.data;
 
       setAuth(user, token);
+
+      // Sempre redirecionar para o dashboard normal
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Erro ao fazer login');
