@@ -31,7 +31,7 @@ const faqs = [
   },
   {
     question: 'Preciso saber programar?',
-    answer: 'Não! O Zyva foi desenvolvido para ser usado por qualquer pessoa. Todas as automações são criadas visualmente, com drag-and-drop, sem necessidade de código.'
+    answer: 'Não! O Thumdra foi desenvolvido para ser usado por qualquer pessoa. Todas as automações são criadas visualmente, com drag-and-drop, sem necessidade de código.'
   },
   {
     question: 'Quais métodos de pagamento são aceitos?',
@@ -104,7 +104,7 @@ export default function FAQ() {
             </span>
           </h2>
           <p className="text-xl text-gray-600">
-            Tire suas dúvidas sobre o Zyva
+            Tire suas dúvidas sobre o Thumdra
           </p>
         </motion.div>
 
@@ -127,7 +127,7 @@ export default function FAQ() {
             Não encontrou o que procurava?
           </p>
           <a
-            href="mailto:suporte@zyva.com.br"
+            href="mailto:suporte@thumdra.com.br"
             className="inline-flex items-center gap-2 text-purple-600 font-semibold hover:text-purple-700 transition"
           >
             Entre em contato com nosso suporte →

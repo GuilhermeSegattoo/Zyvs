@@ -1,4 +1,4 @@
-# 📊 Status Atual do Projeto Zyva
+# 📊 Status Atual do Projeto Thumdra
 
 **Última atualização**: 14/12/2024
 

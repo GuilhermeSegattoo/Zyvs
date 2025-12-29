@@ -1,4 +1,4 @@
-# 🗺️ Zyva - Estrutura de Rotas e Navegação
+# 🗺️ Thumdra - Estrutura de Rotas e Navegação
 
 ## 📋 Índice
 1. [Fluxo Completo do Usuário](#fluxo-completo)
@@ -907,7 +907,7 @@ export default function CadastroPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Zyva
+            Thumdra
           </h1>
           <p className="text-gray-600 mt-2">Crie sua conta</p>
         </div>
@@ -1061,7 +1061,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Zyva
+            Thumdra
           </h1>
           <p className="text-gray-600 mt-2">Entre na sua conta</p>
         </div>
@@ -1149,7 +1149,7 @@ import { CheckCircle } from 'lucide-react';
 
 const steps = [
   {
-    title: 'Bem-vindo ao Zyva! 👋',
+    title: 'Bem-vindo ao Thumdra! 👋',
     description: 'Vamos configurar sua conta em 3 passos rápidos.',
   },
   {

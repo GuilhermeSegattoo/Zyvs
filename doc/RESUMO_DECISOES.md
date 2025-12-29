@@ -1,4 +1,4 @@
-# 📊 Zyva - Resumo de Decisões Técnicas
+# 📊 Thumdra - Resumo de Decisões Técnicas
 
 ## ✅ O que foi definido e documentado
 

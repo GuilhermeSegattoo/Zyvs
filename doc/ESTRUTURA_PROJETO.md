@@ -1,4 +1,4 @@
-# 📂 Estrutura Completa do Projeto Zyva
+# 📂 Estrutura Completa do Projeto Thumdra
 
 ## 🎯 Visão Geral
 
@@ -9,7 +9,7 @@ Este documento mostra **exatamente** onde está cada arquivo e o que você preci
 ## 📁 Estado Atual do Projeto
 
 ```
-zyva/                                    # ✅ Pasta raiz
+thumdra/                                 # ✅ Pasta raiz
 ├── frontend/                            # ✅ Criada (vazia)
 ├── backend/                             # ✅ Criada (vazia)
 │
@@ -174,7 +174,7 @@ frontend/
 #### `package.json`
 ```json
 {
-  "name": "zyva-frontend",
+  "name": "thumdra-frontend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -319,7 +319,7 @@ backend/
 #### `package.json`
 ```json
 {
-  "name": "zyva-backend",
+  "name": "thumdra-backend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -359,7 +359,7 @@ backend/
 #### `.env.example`
 ```env
 # Database
-DATABASE_URL="postgresql://zyva:zyva123@localhost:5432/zyva_db"
+DATABASE_URL="postgresql://thumdra:thumdra123@localhost:5432/thumdra_db"
 
 # Redis
 REDIS_URL="redis://localhost:6379"

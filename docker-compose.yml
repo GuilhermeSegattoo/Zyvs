@@ -4,28 +4,28 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
-    container_name: zyva-postgres
+    container_name: thumdra-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: zyva
-      POSTGRES_PASSWORD: zyva123
-      POSTGRES_DB: zyva_db
+      POSTGRES_USER: thumdra
+      POSTGRES_PASSWORD: thumdra123
+      POSTGRES_DB: thumdra_db
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U zyva']
+      test: ['CMD-SHELL', 'pg_isready -U thumdra']
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - zyva-network
+      - thumdra-network
 
   # Redis Cache and Queue
   redis:
     image: redis:7-alpine
-    container_name: zyva-redis
+    container_name: thumdra-redis
     restart: unless-stopped
     ports:
       - '6379:6379'
@@ -38,29 +38,29 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - zyva-network
+      - thumdra-network
 
   # pgAdmin (opcional - para gerenciar PostgreSQL visualmente)
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: zyva-pgadmin
+    container_name: thumdra-pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@zyva.com
+      PGADMIN_DEFAULT_EMAIL: admin@thumdra.com
       PGADMIN_DEFAULT_PASSWORD: admin123
     ports:
       - '5050:80'
     depends_on:
       - postgres
     networks:
-      - zyva-network
+      - thumdra-network
     profiles:
       - tools  # Só roda se executar: docker-compose --profile tools up
 
   # Redis Commander (opcional - para visualizar Redis)
   redis-commander:
     image: rediscommander/redis-commander:latest
-    container_name: zyva-redis-commander
+    container_name: thumdra-redis-commander
     restart: unless-stopped
     environment:
       REDIS_HOSTS: local:redis:6379
@@ -69,7 +69,7 @@ services:
     depends_on:
       - redis
     networks:
-      - zyva-network
+      - thumdra-network
     profiles:
       - tools  # Só roda se executar: docker-compose --profile tools up
 
@@ -80,5 +80,5 @@ volumes:
     driver: local
 
 networks:
-  zyva-network:
+  thumdra-network:
     driver: bridge

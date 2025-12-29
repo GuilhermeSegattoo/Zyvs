@@ -1,8 +1,8 @@
-# 🚀 COMECE AQUI - Guia Rápido do Zyva
+# 🚀 COMECE AQUI - Guia Rápido do Thumdra
 
 ## 👋 Bem-vindo!
 
-Este é o ponto de partida para desenvolver o **Zyva**. Siga este guia passo a passo.
+Este é o ponto de partida para desenvolver o **Thumdra**. Siga este guia passo a passo.
 
 ---
 
@@ -58,7 +58,7 @@ docker-compose --version
 
 ```bash
 # Já está na pasta certa!
-cd zyva
+cd thumdra
 
 # Iniciar banco de dados
 docker-compose up -d
@@ -191,7 +191,7 @@ npm install
 
 **Database**:
 - pgAdmin: `http://localhost:5050`
-  - Email: `admin@zyva.com`
+  - Email: `admin@thumdra.com`
   - Senha: `admin123`
 - Redis Commander: `http://localhost:8081`
 

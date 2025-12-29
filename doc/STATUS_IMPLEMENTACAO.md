@@ -1,4 +1,4 @@
-# 🎉 Zyva - Status da Implementação
+1# 🎉 Thumdra - Status da Implementação
 
 **Data**: 13/12/2024
 **Status**: ✅ **BACKEND E FRONTEND FUNCIONANDO 100%**
@@ -174,7 +174,7 @@ curl http://localhost:3001/health
 ```bash
 curl -X POST http://localhost:3001/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"name":"Teste","email":"teste@zyva.com","password":"senha123"}'
+  -d '{"name":"Teste","email":"teste@thumdra.com","password":"senha123"}'
 # ✅ Retornou: {user, token}
 ```
 
@@ -182,7 +182,7 @@ curl -X POST http://localhost:3001/api/auth/register \
 ```bash
 curl -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"teste@zyva.com","password":"senha123"}'
+  -d '{"email":"teste@thumdra.com","password":"senha123"}'
 # ✅ Retornou: {user, token}
 ```
 
@@ -209,7 +209,7 @@ curl -X GET http://localhost:3001/api/auth/me \
 
 ### Tabelas Criadas (12)
 
-1. ✅ `users` - 2 registros (teste@zyva.com + novo usuário)
+1. ✅ `users` - 2 registros (teste@thumdra.com + novo usuário)
 2. ✅ `organizations` - 2 registros
 3. ✅ `contacts` - 0 registros (será usado na FASE 2)
 4. ✅ `tags` - 0 registros

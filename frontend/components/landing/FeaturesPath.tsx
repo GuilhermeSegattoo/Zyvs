@@ -1,231 +1,138 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { MessageSquare, Users, Zap, BarChart3, Calendar, Workflow } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { MessageSquare, Users, Workflow, Zap, Calendar, BarChart3, Globe, Shield } from 'lucide-react';
 
 const features = [
   {
     icon: MessageSquare,
-    title: 'WhatsApp Integrado',
-    description: 'Conecte sua conta do WhatsApp Business e automatize conversas com seus clientes.',
-    color: 'from-green-500 to-emerald-500',
-    position: 'left'
+    title: 'WhatsApp Business',
+    description: 'API oficial integrada. Mensagens em massa sem bloqueio.',
+    color: 'bg-[#25d366]',
   },
   {
     icon: Users,
-    title: 'Gestão de Contatos',
-    description: 'Organize todos os seus clientes em um CRM completo com tags e filtros inteligentes.',
-    color: 'from-blue-500 to-cyan-500',
-    position: 'right'
+    title: 'CRM Completo',
+    description: 'Gestão de contatos, tags, histórico e campos customizáveis.',
+    color: 'bg-[#00ff88]',
   },
   {
     icon: Workflow,
-    title: 'Flow Builder Visual',
-    description: 'Crie automações complexas com drag-and-drop. Sem código, sem complicação.',
-    color: 'from-purple-500 to-pink-500',
-    position: 'left'
+    title: 'Flow Builder',
+    description: 'Automações visuais. Drag & drop. Sem código.',
+    color: 'bg-[#9333ea]',
   },
   {
     icon: Zap,
-    title: 'Automações Inteligentes',
-    description: 'Disparos automáticos de mensagens, follow-ups e nutrição de leads.',
-    color: 'from-yellow-500 to-orange-500',
-    position: 'right'
+    title: 'Automações',
+    description: 'Disparos automáticos, follow-ups e nutrição de leads.',
+    color: 'bg-[#ffeb3b]',
   },
   {
     icon: Calendar,
-    title: 'Aniversários Automáticos',
-    description: 'Nunca mais esqueça um aniversário. Mensagens personalizadas enviadas automaticamente.',
-    color: 'from-red-500 to-pink-500',
-    position: 'left'
+    title: 'Aniversários',
+    description: 'Mensagens automáticas personalizadas todo dia.',
+    color: 'bg-[#ff3366]',
   },
   {
     icon: BarChart3,
-    title: 'Analytics e Relatórios',
-    description: 'Acompanhe métricas em tempo real e tome decisões baseadas em dados.',
-    color: 'from-indigo-500 to-purple-500',
-    position: 'right'
-  }
+    title: 'Analytics',
+    description: 'Métricas em tempo real. ROI, conversão, engajamento.',
+    color: 'bg-[#3b82f6]',
+  },
+  {
+    icon: Globe,
+    title: 'Multi-Canal',
+    description: 'WhatsApp, Instagram, Email, SMS integrados.',
+    color: 'bg-[#ec4899]',
+  },
+  {
+    icon: Shield,
+    title: 'Segurança',
+    description: 'LGPD, criptografia E2E, backup diário automático.',
+    color: 'bg-black',
+  },
 ];
 
-interface FeatureCardProps {
-  feature: typeof features[0];
-  index: number;
-}
-
-function FeatureCard({ feature, index }: FeatureCardProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const Icon = feature.icon;
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, x: feature.position === 'left' ? -50 : 50 }}
-      animate={isInView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className={`flex ${feature.position === 'right' ? 'justify-end' : 'justify-start'} mb-32`}
-    >
-      <div className={`w-full md:w-1/2 ${feature.position === 'right' ? 'md:pr-12' : 'md:pl-12'}`}>
-        <motion.div
-          whileHover={{ scale: 1.02, y: -5 }}
-          className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border border-gray-100"
-        >
-          {/* Icon */}
-          <div className={`inline-flex p-4 rounded-xl bg-gradient-to-br ${feature.color} mb-6`}>
-            <Icon className="w-8 h-8 text-white" />
-          </div>
-
-          {/* Title */}
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            {feature.title}
-          </h3>
-
-          {/* Description */}
-          <p className="text-gray-600 text-lg leading-relaxed">
-            {feature.description}
-          </p>
-
-          {/* Decorative gradient line */}
-          <div className={`mt-6 h-1 w-20 rounded-full bg-gradient-to-r ${feature.color}`} />
-        </motion.div>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function FeaturesPath() {
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const pathRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!pathRef.current) return;
-
-      const element = pathRef.current;
-      const rect = element.getBoundingClientRect();
-      const elementTop = rect.top + window.scrollY;
-      const elementHeight = rect.height;
-      const windowHeight = window.innerHeight;
-      const scrollY = window.scrollY;
-
-      // Calculate progress (0 to 1)
-      const start = elementTop - windowHeight;
-      const end = elementTop + elementHeight;
-      const progress = Math.max(0, Math.min(1, (scrollY - start) / (end - start)));
-
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial call
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
-    <section id="funcionalidades" className="relative py-32 bg-gradient-to-b from-white to-purple-50 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+    <section id="funcionalidades" className="relative py-32 bg-white grid-bg">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        {/* Header - asymmetric */}
+        <div className="mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block mb-6 -rotate-1"
+          >
+            <div className="px-5 py-2 bg-black text-[#00ff88] brutal-border brutal-shadow-sm font-bold uppercase text-sm">
+              FUNCIONALIDADES
+            </div>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight max-w-4xl"
+          >
+            TUDO QUE VOCÊ PRECISA.
+            <br />
+            <span className="text-[#00ff88]">NADA A MAIS.</span>
+          </motion.h2>
+        </div>
+
+        {/* Features Grid - asymmetric */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            const rotation = index % 3 === 0 ? 'rotate-1' : index % 2 === 0 ? '-rotate-1' : '';
+
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ x: 4, y: -4 }}
+                className={`group bg-white brutal-border brutal-shadow hover:brutal-shadow-lg p-8 transition-all ${rotation}`}
+              >
+                {/* Icon */}
+                <div className={`inline-flex p-4 mb-6 ${feature.color} ${feature.color === 'bg-black' ? 'text-[#00ff88]' : 'text-black'} brutal-border brutal-shadow-sm`}>
+                  <Icon className="w-7 h-7" strokeWidth={2.5} />
+                </div>
+
+                {/* Content */}
+                <h3 className="text-2xl font-extrabold mb-3 uppercase">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-700 font-medium leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Bottom CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mt-20"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Funcionalidades
-            </span>{' '}
-            que Transformam
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Tudo que você precisa para gerenciar seu negócio em um só lugar
-          </p>
-        </motion.div>
-
-        {/* Features with Path */}
-        <div ref={pathRef} className="relative">
-          {/* Animated Path */}
-          <svg
-            className="absolute left-1/2 top-0 transform -translate-x-1/2 hidden md:block"
-            width="4"
-            height="100%"
-            style={{ zIndex: 0 }}
-          >
-            {/* Background path */}
-            <line
-              x1="2"
-              y1="0"
-              x2="2"
-              y2="100%"
-              stroke="#e5e7eb"
-              strokeWidth="4"
-            />
-            {/* Animated glowing path */}
-            <motion.line
-              x1="2"
-              y1="0"
-              x2="2"
-              y2="100%"
-              stroke="url(#gradient)"
-              strokeWidth="4"
-              strokeDasharray="100%"
-              initial={{ strokeDashoffset: "100%" }}
-              style={{
-                strokeDashoffset: `${100 - scrollProgress * 100}%`,
-                filter: 'drop-shadow(0 0 8px rgba(147, 51, 234, 0.8))'
-              }}
-            />
-            <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#9333ea" />
-                <stop offset="50%" stopColor="#ec4899" />
-                <stop offset="100%" stopColor="#9333ea" />
-              </linearGradient>
-            </defs>
-          </svg>
-
-          {/* Nodes on path */}
-          {features.map((_, index) => (
-            <motion.div
-              key={index}
-              className="absolute left-1/2 transform -translate-x-1/2 hidden md:block"
-              style={{
-                top: `${(index / (features.length - 1)) * 100}%`,
-                zIndex: 1
-              }}
-              initial={{ scale: 0 }}
-              animate={{
-                scale: scrollProgress * features.length > index ? 1 : 0,
-              }}
-              transition={{ duration: 0.3 }}
+          <a href="/cadastro">
+            <motion.button
+              whileHover={{ x: 6, y: -6 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-10 py-5 bg-[#ff3366] text-white brutal-border-thick brutal-shadow-lg font-extrabold text-lg uppercase tracking-wide hover:bg-[#ff3366]/90 transition-colors"
             >
-              <div className="w-4 h-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full shadow-lg" />
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full"
-                animate={{
-                  scale: scrollProgress * features.length > index ? [1, 1.5, 1] : 1,
-                  opacity: scrollProgress * features.length > index ? [1, 0, 1] : 0,
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-            </motion.div>
-          ))}
-
-          {/* Feature Cards */}
-          <div className="relative z-10">
-            {features.map((feature, index) => (
-              <FeatureCard key={index} feature={feature} index={index} />
-            ))}
-          </div>
-        </div>
+              TESTAR GRÁTIS →
+            </motion.button>
+          </a>
+        </motion.div>
       </div>
     </section>
   );

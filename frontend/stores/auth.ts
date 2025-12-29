@@ -38,16 +38,16 @@ export const useAuthStore = create<AuthStore>()(
       setAuth: (user, token) => {
         set({ user, token, isAuthenticated: true });
         if (typeof window !== 'undefined') {
-          localStorage.setItem('zyva-token', token);
-          localStorage.setItem('zyva-user', JSON.stringify(user));
+          localStorage.setItem('thumdra-token', token);
+          localStorage.setItem('thumdra-user', JSON.stringify(user));
         }
       },
 
       logout: () => {
         set({ user: null, token: null, isAuthenticated: false });
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('zyva-token');
-          localStorage.removeItem('zyva-user');
+          localStorage.removeItem('thumdra-token');
+          localStorage.removeItem('thumdra-user');
         }
       },
 
@@ -57,13 +57,13 @@ export const useAuthStore = create<AuthStore>()(
           const updatedUser = { ...currentUser, ...userData };
           set({ user: updatedUser });
           if (typeof window !== 'undefined') {
-            localStorage.setItem('zyva-user', JSON.stringify(updatedUser));
+            localStorage.setItem('thumdra-user', JSON.stringify(updatedUser));
           }
         }
       },
     }),
     {
-      name: 'zyva-auth-storage',
+      name: 'thumdra-auth-storage',
     }
   )
 );

@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ============================================
-# Zyva CRM - Script de Inicialização Completa
+# Thumdra CRM - Script de Inicialização Completa
 # ============================================
-# Este script automatiza o setup e inicialização do projeto Zyva
+# Este script automatiza o setup e inicialização do projeto Thumdra
 # Plataforma: Linux, macOS, WSL, Git Bash
 
 # Cores para output
@@ -15,7 +15,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 echo -e "${CYAN}=================================================="
-echo -e "  Zyva CRM - Iniciando Projeto Completo"
+echo -e "  Thumdra CRM - Iniciando Projeto Completo"
 echo -e "==================================================${NC}"
 echo ""
 

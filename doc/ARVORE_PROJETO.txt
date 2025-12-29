@@ -1,7 +1,7 @@
-📦 Zyva - Estrutura Atual do Projeto
+📦 Thumdra - Estrutura Atual do Projeto
 =====================================
 
-zyva/
+thumdra/
 ├── 📁 frontend/                    ✅ Criada (vazia - a ser implementada)
 ├── 📁 backend/                     ✅ Criada (vazia - a ser implementada)
 │
@@ -39,4 +39,4 @@ Status: ✅ 100% Pronto para desenvolvimento
 2. Rodar: docker-compose up -d  
 3. Seguir: PLANO_DESENVOLVIMENTO.md → FASE 0
 
-🚀 Vamos construir o Zyva!
+🚀 Vamos construir o Thumdra!

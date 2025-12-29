@@ -1,11 +1,11 @@
 # ============================================
-# Zyva CRM - Script de Inicialização Completa
+# Thumdra CRM - Script de Inicialização Completa
 # ============================================
-# Este script automatiza o setup e inicialização do projeto Zyva
+# Este script automatiza o setup e inicialização do projeto Thumdra
 # Plataforma: Windows PowerShell
 
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "  Zyva CRM - Iniciando Projeto Completo" -ForegroundColor Cyan
+Write-Host "  Thumdra CRM - Iniciando Projeto Completo" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host ""
 

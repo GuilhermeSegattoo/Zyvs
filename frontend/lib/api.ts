@@ -10,7 +10,7 @@ export const api = axios.create({
 // Interceptor para adicionar token em todas as requisições
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('zyva-token');
+    const token = localStorage.getItem('thumdra-token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -25,8 +25,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token inválido ou expirado
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('zyva-token');
-        localStorage.removeItem('zyva-user');
+        localStorage.removeItem('thumdra-token');
+        localStorage.removeItem('thumdra-user');
         window.location.href = '/login';
       }
     }

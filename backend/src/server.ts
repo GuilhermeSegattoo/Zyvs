@@ -56,7 +56,7 @@ fastify.get('/health', async () => {
 // Root
 fastify.get('/', async () => {
   return {
-    name: 'Zyva API',
+    name: 'Thumdra API',
     version: '1.0.0',
     docs: '/api/docs',
   };
@@ -73,7 +73,7 @@ const start = async () => {
     console.log(`
 ╔═══════════════════════════════════════╗
 ║                                       ║
-║   🚀 Zyva API Server                  ║
+║   🚀 Thumdra API Server               ║
 ║                                       ║
 ║   Server:  http://localhost:${port}      ║
 ║   Health:  http://localhost:${port}/health ║

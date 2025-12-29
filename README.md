@@ -1,4 +1,4 @@
-# 🚀 Zyva - Plataforma de Automação de Relacionamento com Clientes
+# 🚀 Thumdra - Plataforma de Automação de Relacionamento com Clientes
 
 <div align="center">
   <h3>Automatize mensagens, gerencie pipeline e crie automações inteligentes</h3>
@@ -9,7 +9,7 @@
 
 ## 📋 Sobre o Projeto
 
-**Zyva** é uma plataforma SaaS completa para automação de processos de relacionamento com clientes. O diferencial está na integração total entre todos os módulos, permitindo criar fluxos automatizados que se comunicam com o Kanban, enviam mensagens programadas e gerenciam toda a jornada do cliente.
+**Thumdra** é uma plataforma SaaS completa para automação de processos de relacionamento com clientes. O diferencial está na integração total entre todos os módulos, permitindo criar fluxos automatizados que se comunicam com o Kanban, enviam mensagens programadas e gerenciam toda a jornada do cliente.
 
 ### ✨ Principais Funcionalidades
 
@@ -55,7 +55,7 @@
 ## 📁 Estrutura do Projeto
 
 ```
-zyva/
+thumdra/
 ├── frontend/          # Aplicação Next.js
 │   ├── src/
 │   │   ├── app/      # Rotas (App Router)
@@ -116,8 +116,8 @@ docker-compose ps
 ```
 
 Você deve ver:
-- ✅ zyva-postgres (healthy)
-- ✅ zyva-redis (healthy)
+- ✅ thumdra-postgres (healthy)
+- ✅ thumdra-redis (healthy)
 
 ### Passo 2: Backend já está configurado! ✅
 
@@ -302,10 +302,10 @@ docker-compose logs -f
 docker-compose --profile tools up -d
 
 # Acessar PostgreSQL
-docker exec -it zyva-postgres psql -U zyva -d zyva_db
+docker exec -it thumdra-postgres psql -U thumdra -d thumdra_db
 
 # Acessar Redis CLI
-docker exec -it zyva-redis redis-cli
+docker exec -it thumdra-redis redis-cli
 ```
 
 ### Prisma
@@ -334,7 +334,7 @@ npx prisma generate
 # http://localhost:3001/admin/queues
 
 # Ver filas no Redis
-docker exec -it zyva-redis redis-cli
+docker exec -it thumdra-redis redis-cli
 > KEYS bull:*
 > LRANGE bull:messages:waiting 0 -1
 ```

@@ -1,4 +1,4 @@
-# ✅ Zyva - Status do Projeto
+# ✅ Thumdra - Status do Projeto
 
 ## 📊 Resumo Executivo
 
@@ -325,7 +325,7 @@ Antes de começar a codificar, confirme:
 
 ## 🎉 Parabéns!
 
-Você tem **TUDO** o que precisa para construir o Zyva!
+Você tem **TUDO** o que precisa para construir o Thumdra!
 
 **Total de documentação**: 207 KB (45k palavras)
 **Total de arquivos**: 13 arquivos

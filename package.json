@@ -1,7 +1,7 @@
 {
-  "name": "zyva",
+  "name": "thumdra",
   "version": "1.0.0",
-  "description": "CRM SaaS Platform - Zyva",
+  "description": "CRM SaaS Platform - Thumdra",
   "private": true,
   "scripts": {
     "dev": "concurrently -n \"backend,frontend\" -c \"green,blue\" \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",

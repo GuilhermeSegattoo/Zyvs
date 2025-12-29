@@ -1,171 +1,175 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Check, Sparkles } from 'lucide-react';
+import { Check } from 'lucide-react';
 import Link from 'next/link';
 
 const plans = [
   {
-    name: 'Free',
+    name: 'STARTER',
     price: '0',
-    description: 'Perfeito para começar',
+    period: 'GRÁTIS SEMPRE',
     features: [
       '100 contatos',
-      '2 flows de automação',
-      '500 mensagens/mês',
-      'WhatsApp integrado',
-      'Suporte por email',
-      'Aniversários automáticos'
+      '2 flows',
+      '500 msg/mês',
+      'WhatsApp',
+      'Email support',
     ],
-    cta: 'Começar Grátis',
-    popular: false,
-    gradient: 'from-gray-600 to-gray-800'
+    color: 'bg-white',
+    textColor: 'text-black',
   },
   {
-    name: 'Pro',
-    price: '97',
-    description: 'Para negócios em crescimento',
+    name: 'PRO',
+    price: '147',
+    period: '/MÊS',
     features: [
-      '5.000 contatos',
-      '10 flows de automação',
-      '10.000 mensagens/mês',
+      'Tudo do Starter',
+      '5k contatos',
+      '15 flows',
+      '15k msg/mês',
       'WhatsApp + Instagram + Email',
       'Suporte prioritário',
       'Analytics avançado',
-      'Exportação de relatórios',
-      'API de integração'
+      'API access',
     ],
-    cta: 'Começar Teste Grátis',
+    color: 'bg-[#00ff88]',
+    textColor: 'text-black',
     popular: true,
-    gradient: 'from-purple-600 to-pink-600'
   },
   {
-    name: 'Business',
-    price: '297',
-    description: 'Para empresas estabelecidas',
+    name: 'ENTERPRISE',
+    price: 'CUSTOM',
+    period: 'SOB MEDIDA',
     features: [
-      'Contatos ilimitados',
-      'Flows ilimitados',
-      '100.000 mensagens/mês',
-      'Todas as integrações',
-      'Suporte 24/7',
-      'Gerente de conta dedicado',
+      'Tudo do Pro',
+      'Ilimitado',
       'White-label',
-      'Treinamento personalizado',
-      'SLA garantido'
+      'Suporte 24/7',
+      'Gerente dedicado',
+      'SLA 99.9%',
+      'Servidor dedicado',
     ],
-    cta: 'Falar com Vendas',
-    popular: false,
-    gradient: 'from-indigo-600 to-purple-600'
-  }
+    color: 'bg-black',
+    textColor: 'text-white',
+  },
 ];
 
 export default function Pricing() {
   return (
-    <section id="planos" className="relative py-32 bg-white overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-50/50 to-transparent" />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="planos" className="relative py-32 bg-[#f5f5f5] grid-bg">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Planos{' '}
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Transparentes
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Escolha o plano ideal para o tamanho do seu negócio
-          </p>
-        </motion.div>
+        <div className="mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block mb-6 rotate-1"
+          >
+            <div className="px-5 py-2 bg-[#ff3366] text-white brutal-border brutal-shadow-sm font-bold uppercase text-sm">
+              PREÇOS TRANSPARENTES
+            </div>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight"
+          >
+            SEM PEGADINHA.
+            <br />
+            SEM TAXAS ESCONDIDAS.
+          </motion.h2>
+        </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8 }}
-              className={`relative bg-white rounded-2xl p-8 shadow-xl ${
-                plan.popular ? 'ring-2 ring-purple-600 shadow-purple-200' : ''
-              }`}
+              className={`relative ${index % 2 === 0 ? 'rotate-1' : '-rotate-1'}`}
             >
               {/* Popular badge */}
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="flex items-center gap-1 px-4 py-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold rounded-full shadow-lg">
-                    <Sparkles className="w-4 h-4" />
-                    Mais Popular
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10 -rotate-2">
+                  <div className="px-4 py-1.5 bg-[#ffeb3b] brutal-border brutal-shadow-sm font-extrabold text-xs uppercase">
+                    MAIS POPULAR
                   </div>
                 </div>
               )}
 
-              {/* Plan name */}
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                {plan.name}
-              </h3>
-              <p className="text-gray-600 mb-6">{plan.description}</p>
+              <div className={`${plan.color} ${plan.textColor} p-10 brutal-border-thick brutal-shadow-lg h-full flex flex-col`}>
+                {/* Plan name */}
+                <h3 className="text-2xl font-extrabold mb-2 uppercase">
+                  {plan.name}
+                </h3>
 
-              {/* Price */}
-              <div className="mb-8">
-                <div className="flex items-baseline">
-                  <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    R${plan.price}
-                  </span>
-                  <span className="text-gray-500 ml-2">/mês</span>
-                </div>
-              </div>
-
-              {/* Features */}
-              <ul className="space-y-4 mb-8">
-                {plan.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <div className={`flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br ${plan.gradient} flex items-center justify-center mt-0.5`}>
-                      <Check className="w-3 h-3 text-white" />
+                {/* Price */}
+                <div className="mb-8">
+                  {plan.price === 'CUSTOM' ? (
+                    <div className="text-5xl font-extrabold">CUSTOM</div>
+                  ) : (
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-xl font-bold">R$</span>
+                      <span className="text-6xl font-extrabold">{plan.price}</span>
+                      <span className="text-sm font-bold opacity-70">{plan.period}</span>
                     </div>
-                    <span className="text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
+                  )}
+                </div>
 
-              {/* CTA */}
-              <Link href="/cadastro">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`w-full py-3 rounded-xl font-semibold transition-all ${
-                    plan.popular
-                      ? `bg-gradient-to-r ${plan.gradient} text-white shadow-lg hover:shadow-xl`
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                  }`}
-                >
-                  {plan.cta}
-                </motion.button>
-              </Link>
+                {/* Features */}
+                <ul className="space-y-4 mb-10 flex-grow">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <div className={`mt-1 w-5 h-5 flex-shrink-0 ${plan.color === 'bg-black' ? 'bg-[#00ff88]' : 'bg-black'}`}>
+                        <Check className={`w-5 h-5 ${plan.color === 'bg-black' ? 'text-black' : 'text-white'}`} strokeWidth={4} />
+                      </div>
+                      <span className="font-bold text-sm uppercase leading-relaxed">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* CTA */}
+                <Link href="/cadastro" className="block mt-auto">
+                  <motion.button
+                    whileHover={{ x: 4, y: -4 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`w-full py-4 ${
+                      plan.color === 'bg-black'
+                        ? 'bg-[#00ff88] text-black'
+                        : plan.color === 'bg-[#00ff88]'
+                        ? 'bg-black text-white'
+                        : 'bg-black text-white'
+                    } brutal-border-thick brutal-shadow font-extrabold uppercase text-sm tracking-wider`}
+                  >
+                    {plan.price === 'CUSTOM' ? 'FALAR COM VENDAS' : 'COMEÇAR AGORA'}
+                  </motion.button>
+                </Link>
+              </div>
             </motion.div>
           ))}
         </div>
 
         {/* Bottom note */}
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center text-gray-500 mt-12"
+          className="text-center mt-16 space-y-4"
         >
-          Todos os planos incluem 14 dias de teste grátis. Sem cartão de crédito necessário.
-        </motion.p>
+          <div className="inline-block px-6 py-3 bg-white brutal-border brutal-shadow rotate-1">
+            <p className="font-bold uppercase text-sm">
+              ✓ 14 DIAS GRÁTIS • ✓ SEM CARTÃO • ✓ CANCELE QUANDO QUISER
+            </p>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

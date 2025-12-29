@@ -1,4 +1,4 @@
-# 🔴 Redis - Estrutura de Cache e Filas
+# 🔴 Redis - Estrutura de Cache e Filas do Thumdra
 
 ## 📋 Visão Geral
 
@@ -104,7 +104,7 @@ await messageQueue.add('send-message', {
   organizationId: 'org_abc',
   contactId: 'contact_xyz',
   channel: 'WHATSAPP',
-  content: 'Olá {{nome}}! Bem-vindo ao Zyva!',
+  content: 'Olá {{nome}}! Bem-vindo ao Thumdra!',
 });
 ```
 
@@ -212,7 +212,7 @@ export const messageWorker = new Worker(
         const email = new EmailService(process.env.RESEND_API_KEY!);
         result = await email.sendEmail(
           contact.email!,
-          'Mensagem Zyva',
+          'Mensagem Thumdra',
           personalizedContent
         );
         break;
@@ -281,7 +281,7 @@ messageWorker.on('progress', (job, progress) => {
 ### Estrutura de Keys
 
 ```
-zyva:cache:{resource}:{id}:{field?}
+thumdra:cache:{resource}:{id}:{field?}
 ```
 
 ### Caches Principais
@@ -289,7 +289,7 @@ zyva:cache:{resource}:{id}:{field?}
 #### 1. Cache de Usuário
 
 ```typescript
-// Chave: zyva:cache:user:{userId}
+// Chave: thumdra:cache:user:{userId}
 // TTL: 1 hora
 // Valor: JSON do usuário
 
@@ -304,20 +304,20 @@ interface CachedUser {
 
 // Exemplo
 await redis.setex(
-  `zyva:cache:user:${userId}`,
+  `thumdra:cache:user:${userId}`,
   3600, // 1 hora
   JSON.stringify(user)
 );
 
 // Recuperar
-const cached = await redis.get(`zyva:cache:user:${userId}`);
+const cached = await redis.get(`thumdra:cache:user:${userId}`);
 const user = cached ? JSON.parse(cached) : null;
 ```
 
 #### 2. Cache de Organização
 
 ```typescript
-// Chave: zyva:cache:org:{organizationId}
+// Chave: thumdra:cache:org:{organizationId}
 // TTL: 30 minutos
 
 interface CachedOrganization {
@@ -331,7 +331,7 @@ interface CachedOrganization {
 }
 
 await redis.setex(
-  `zyva:cache:org:${organizationId}`,
+  `thumdra:cache:org:${organizationId}`,
   1800,
   JSON.stringify(organization)
 );
@@ -340,7 +340,7 @@ await redis.setex(
 #### 3. Cache de Estatísticas do Dashboard
 
 ```typescript
-// Chave: zyva:cache:stats:{organizationId}:dashboard
+// Chave: thumdra:cache:stats:{organizationId}:dashboard
 // TTL: 5 minutos
 
 interface DashboardStats {
@@ -353,7 +353,7 @@ interface DashboardStats {
 }
 
 await redis.setex(
-  `zyva:cache:stats:${organizationId}:dashboard`,
+  `thumdra:cache:stats:${organizationId}:dashboard`,
   300, // 5 minutos
   JSON.stringify(stats)
 );
@@ -362,11 +362,11 @@ await redis.setex(
 #### 4. Cache de Limites de Plano (Rate Check)
 
 ```typescript
-// Chave: zyva:limits:{organizationId}:{resource}
+// Chave: thumdra:limits:{organizationId}:{resource}
 // TTL: Até fim do mês
 
 // Exemplo: Contagem de mensagens do mês
-const key = `zyva:limits:${organizationId}:messages`;
+const key = `thumdra:limits:${organizationId}:messages`;
 const count = await redis.incr(key);
 
 // Definir expiração até fim do mês
@@ -391,7 +391,7 @@ if (count > organization.maxMessagesPerMonth) {
 import { redis } from './redis';
 
 export class CacheService {
-  private prefix = 'zyva:cache';
+  private prefix = 'thumdra:cache';
 
   /**
    * Busca no cache ou executa função
@@ -500,7 +500,7 @@ export function rateLimit(options: RateLimitOptions) {
     const { max, window } = options;
     const userId = req.user?.id || req.ip;
 
-    const key = `zyva:ratelimit:${userId}`;
+    const key = `thumdra:ratelimit:${userId}`;
 
     // Incrementar contador
     const current = await redis.incr(key);
@@ -549,7 +549,7 @@ export async function planRateLimit(req: FastifyRequest, reply: FastifyReply) {
   const plan = user.plan || 'FREE';
 
   const limits = PLAN_LIMITS[plan];
-  const key = `zyva:ratelimit:plan:${user.id}`;
+  const key = `thumdra:ratelimit:plan:${user.id}`;
 
   const current = await redis.incr(key);
   if (current === 1) await redis.expire(key, limits.window);
@@ -570,7 +570,7 @@ export async function planRateLimit(req: FastifyRequest, reply: FastifyReply) {
 ### Sessões de Usuário
 
 ```typescript
-// Chave: zyva:session:{sessionId}
+// Chave: thumdra:session:{sessionId}
 // TTL: 7 dias
 
 interface Session {
@@ -584,32 +584,32 @@ interface Session {
 // Criar sessão
 const sessionId = crypto.randomUUID();
 await redis.setex(
-  `zyva:session:${sessionId}`,
+  `thumdra:session:${sessionId}`,
   7 * 24 * 3600, // 7 dias
   JSON.stringify(session)
 );
 
 // Refresh last activity
-await redis.expire(`zyva:session:${sessionId}`, 7 * 24 * 3600);
+await redis.expire(`thumdra:session:${sessionId}`, 7 * 24 * 3600);
 ```
 
 ### Tokens de Verificação
 
 ```typescript
-// Chave: zyva:token:email:{token}
+// Chave: thumdra:token:email:{token}
 // TTL: 1 hora
 
 const token = crypto.randomBytes(32).toString('hex');
 await redis.setex(
-  `zyva:token:email:${token}`,
+  `thumdra:token:email:${token}`,
   3600,
   userId
 );
 
 // Verificar
-const userId = await redis.get(`zyva:token:email:${token}`);
+const userId = await redis.get(`thumdra:token:email:${token}`);
 if (userId) {
-  await redis.del(`zyva:token:email:${token}`);
+  await redis.del(`thumdra:token:email:${token}`);
   // Token válido, prosseguir
 }
 ```
@@ -737,7 +737,7 @@ function parseRedisInfo(info: string) {
 ## 🎯 Resumo da Estrutura Redis
 
 ```
-zyva:
+thumdra:
 ├── cache:                    # Cache de dados
 │   ├── user:{userId}
 │   ├── org:{orgId}

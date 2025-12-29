@@ -1,6 +1,6 @@
-# Zyva Frontend
+# Thumdra Frontend
 
-Frontend do Zyva CRM desenvolvido com Next.js 15, React 19 e Tailwind CSS.
+Frontend do Thumdra CRM desenvolvido com Next.js 15, React 19 e Tailwind CSS.
 
 ## ✅ Status
 
@@ -152,7 +152,7 @@ frontend/
 
 1. Acesse http://localhost:3000/login
 2. Preencha:
-   - Email: seu@email.com (ou teste@zyva.com se criou no backend)
+   - Email: seu@email.com (ou teste@thumdra.com se criou no backend)
    - Senha: senha123
 3. Clique em "Entrar"
 4. Você será redirecionado para o dashboard

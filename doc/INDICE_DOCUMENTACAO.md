@@ -1,4 +1,4 @@
-# 📚 Índice Completo da Documentação - Zyva
+# 📚 Índice Completo da Documentação - Thumdra
 
 ## 🎯 Guia de Leitura
 
@@ -289,7 +289,7 @@ Se tiver dúvidas:
 
 ## 🎉 Conclusão
 
-**Você tem TUDO o que precisa para construir o Zyva!**
+**Você tem TUDO o que precisa para construir o Thumdra!**
 
 Total de documentação:
 - ✅ 12 arquivos de documentação

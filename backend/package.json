@@ -1,7 +1,7 @@
 {
-  "name": "zyva-backend",
+  "name": "thumdra-backend",
   "version": "1.0.0",
-  "description": "Zyva CRM Backend API",
+  "description": "Thumdra CRM Backend API",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

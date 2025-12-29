@@ -1,6 +1,6 @@
-# Zyva Backend API
+# Thumdra Backend API
 
-Backend do Zyva CRM desenvolvido com Fastify, Prisma e PostgreSQL.
+Backend do Thumdra CRM desenvolvido com Fastify, Prisma e PostgreSQL.
 
 ## ✅ Status
 
@@ -145,7 +145,7 @@ Resposta:
 ```bash
 curl -X POST http://localhost:3001/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"name":"Teste","email":"teste@zyva.com","password":"senha123"}'
+  -d '{"name":"Teste","email":"teste@thumdra.com","password":"senha123"}'
 ```
 
 ### Login
@@ -153,7 +153,7 @@ curl -X POST http://localhost:3001/api/auth/register \
 ```bash
 curl -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"teste@zyva.com","password":"senha123"}'
+  -d '{"email":"teste@thumdra.com","password":"senha123"}'
 ```
 
 ### Obter perfil

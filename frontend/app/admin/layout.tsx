@@ -67,11 +67,11 @@ export default function AdminLayout({
           <Link href="/admin/dashboard">
             <div className="flex items-center gap-2 cursor-pointer group">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-bold">
-                Z
+                T
               </div>
               <div>
                 <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Zyva
+                  Thumdra
                 </span>
                 <span className="block text-xs text-gray-500">Admin</span>
               </div>

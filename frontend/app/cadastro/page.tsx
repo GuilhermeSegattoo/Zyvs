@@ -105,9 +105,9 @@ export default function CadastroPage() {
               className="flex items-center gap-3 cursor-pointer group"
             >
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white font-bold text-2xl border border-white/30">
-                Z
+                T
               </div>
-              <span className="text-3xl font-bold text-white">Zyva</span>
+              <span className="text-3xl font-bold text-white">Thumdra</span>
             </motion.div>
           </Link>
         </div>
@@ -163,7 +163,7 @@ export default function CadastroPage() {
         </div>
 
         <div className="relative z-10 text-purple-100 text-sm">
-          © 2024 Zyva. Todos os direitos reservados.
+          © 2024 Thumdra. Todos os direitos reservados.
         </div>
       </div>
 
@@ -175,10 +175,10 @@ export default function CadastroPage() {
             <Link href="/">
               <div className="flex items-center gap-2 cursor-pointer group">
                 <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
-                  Z
+                  T
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Zyva
+                  Thumdra
                 </span>
               </div>
             </Link>

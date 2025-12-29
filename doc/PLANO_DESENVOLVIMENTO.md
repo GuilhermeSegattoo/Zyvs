@@ -1,8 +1,8 @@
-# 🗺️ Zyva - Plano de Desenvolvimento Completo
+# 🗺️ Thumdra - Plano de Desenvolvimento Completo
 
 ## 📋 Visão Geral
 
-Este documento contém o **roteiro completo** para desenvolver o Zyva do zero até o MVP em produção.
+Este documento contém o **roteiro completo** para desenvolver o Thumdra do zero até o MVP em produção.
 
 O projeto está dividido em **2 pastas principais**:
 - **`frontend/`** - Aplicação Next.js (interface do usuário)
@@ -13,7 +13,7 @@ O projeto está dividido em **2 pastas principais**:
 ## 📁 Estrutura de Pastas
 
 ```
-zyva/
+thumdra/
 ├── frontend/                    # 🎨 APLICAÇÃO NEXT.JS
 │   ├── src/
 │   │   ├── app/                # App Router (rotas)
@@ -81,7 +81,7 @@ Ter o projeto rodando localmente com Docker, banco de dados e estrutura pronta.
 #### 0.1 - Criar estrutura de pastas ✅
 ```bash
 # Já criamos as pastas frontend/ e backend/
-cd zyva
+cd thumdra
 ls  # Deve mostrar: frontend/ backend/
 ```
 
@@ -147,24 +147,24 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: zyva-postgres
+    container_name: thumdra-postgres
     environment:
-      POSTGRES_USER: zyva
-      POSTGRES_PASSWORD: zyva123
-      POSTGRES_DB: zyva_db
+      POSTGRES_USER: thumdra
+      POSTGRES_PASSWORD: thumdra123
+      POSTGRES_DB: thumdra_db
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U zyva']
+      test: ['CMD-SHELL', 'pg_isready -U thumdra']
       interval: 5s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: zyva-redis
+    container_name: thumdra-redis
     ports:
       - '6379:6379'
     volumes:
@@ -200,7 +200,7 @@ npx prisma generate
 # backend/.env
 
 # Database
-DATABASE_URL="postgresql://zyva:zyva123@localhost:5432/zyva_db"
+DATABASE_URL="postgresql://thumdra:thumdra123@localhost:5432/thumdra_db"
 
 # Redis
 REDIS_URL="redis://localhost:6379"
@@ -700,7 +700,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Zyva
+            Thumdra
           </h1>
           <p className="text-gray-600 mt-2">Entre na sua conta</p>
         </div>

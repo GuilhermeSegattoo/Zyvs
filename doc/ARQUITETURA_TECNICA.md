@@ -1,4 +1,4 @@
-# 🏗️ Zyva - Arquitetura Técnica Completa
+# 🏗️ Thumdra - Arquitetura Técnica Completa
 
 ## 📋 Índice
 1. [Visão Geral da Arquitetura](#visão-geral)
@@ -116,7 +116,7 @@
 ## 📁 Estrutura de Pastas Completa
 
 ```
-zyva/
+thumdra/
 ├── README.md
 ├── docker-compose.yml          # Ambiente de dev completo
 ├── .github/
@@ -635,7 +635,7 @@ async function main() {
 
   const user = await prisma.user.create({
     data: {
-      email: 'demo@zyva.com',
+      email: 'demo@thumdra.com',
       password: hashedPassword,
       name: 'Demo User',
       plan: Plan.PRO,
@@ -937,7 +937,7 @@ export class EmailService {
 
   async sendEmail(to: string, subject: string, html: string) {
     const { data, error } = await this.resend.emails.send({
-      from: 'Zyva <noreply@seudominio.com>',
+      from: 'Thumdra <noreply@seudominio.com>',
       to: [to],
       subject: subject,
       html: html,
@@ -987,9 +987,9 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: zyva
+      POSTGRES_USER: thumdra
       POSTGRES_PASSWORD: senha_dev
-      POSTGRES_DB: zyva_db
+      POSTGRES_DB: thumdra_db
     ports:
       - '5432:5432'
     volumes:
@@ -1009,7 +1009,7 @@ services:
     ports:
       - '3001:3001'
     environment:
-      DATABASE_URL: postgresql://zyva:senha_dev@postgres:5432/zyva_db
+      DATABASE_URL: postgresql://thumdra:senha_dev@postgres:5432/thumdra_db
       REDIS_URL: redis://redis:6379
     depends_on:
       - postgres
@@ -1020,7 +1020,7 @@ services:
       context: ./apps/api
       dockerfile: ../../infrastructure/docker/Dockerfile.worker
     environment:
-      DATABASE_URL: postgresql://zyva:senha_dev@postgres:5432/zyva_db
+      DATABASE_URL: postgresql://thumdra:senha_dev@postgres:5432/thumdra_db
       REDIS_URL: redis://redis:6379
     depends_on:
       - postgres
@@ -1080,8 +1080,8 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
 
 # Clonar repositório
-git clone https://github.com/seu-usuario/zyva.git
-cd zyva
+git clone https://github.com/seu-usuario/thumdra.git
+cd thumdra
 
 # Configurar variáveis
 cp apps/api/.env.example apps/api/.env
@@ -1104,7 +1104,7 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ```bash
 # 1. Criar estrutura do projeto
-mkdir zyva && cd zyva
+mkdir thumdra && cd thumdra
 git init
 
 # 2. Criar monorepo
@@ -1113,7 +1113,7 @@ pnpm init
 
 # 3. Criar workspaces (package.json na raiz)
 {
-  "name": "zyva",
+  "name": "thumdra",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -1460,7 +1460,7 @@ const worker = new Worker(
 
       case 'EMAIL':
         const email = new EmailService(process.env.RESEND_API_KEY!);
-        result = await email.sendEmail(contact.email!, 'Mensagem Zyva', content);
+        result = await email.sendEmail(contact.email!, 'Mensagem Thumdra', content);
         break;
 
       default:
@@ -1773,4 +1773,4 @@ birthdayJob.start();
 
 ---
 
-**Criado para o projeto Zyva - Automação de Relacionamento com Clientes**
+**Criado para o projeto Thumdra - Automação de Relacionamento com Clientes**
