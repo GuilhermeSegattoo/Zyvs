@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 
 const faqs = [
   {
@@ -41,6 +41,7 @@ const faqs = [
 
 function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
   const [isOpen, setIsOpen] = useState(false);
+  const rotation = index % 3 === 0 ? 'rotate-1' : index % 2 === 0 ? '-rotate-1' : '';
 
   return (
     <motion.div
@@ -48,22 +49,23 @@ function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.05 }}
-      className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow"
+      whileHover={{ x: 4, y: -4 }}
+      className={`bg-white brutal-border brutal-shadow hover:brutal-shadow-lg transition-all ${rotation}`}
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-6 py-5 flex items-center justify-between text-left"
+        className="w-full px-6 py-5 flex items-center justify-between text-left gap-4"
       >
-        <span className="font-semibold text-gray-900 pr-8">
+        <span className="font-bold text-gray-900 uppercase text-sm md:text-base tracking-wide">
           {faq.question}
         </span>
-        <motion.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex-shrink-0"
-        >
-          <ChevronDown className="w-5 h-5 text-purple-600" />
-        </motion.div>
+        <div className={`flex-shrink-0 w-10 h-10 flex items-center justify-center brutal-border ${isOpen ? 'bg-[#00ff88]' : 'bg-white'} transition-colors`}>
+          {isOpen ? (
+            <Minus className="w-5 h-5" strokeWidth={3} />
+          ) : (
+            <Plus className="w-5 h-5" strokeWidth={3} />
+          )}
+        </div>
       </button>
 
       <AnimatePresence>
@@ -73,9 +75,9 @@ function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="overflow-hidden"
+            className="overflow-hidden border-t-3 border-black"
           >
-            <div className="px-6 pb-5 text-gray-600 leading-relaxed">
+            <div className="px-6 py-5 text-gray-700 leading-relaxed font-medium">
               {faq.answer}
             </div>
           </motion.div>
@@ -87,29 +89,44 @@ function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
 
 export default function FAQ() {
   return (
-    <section id="faq" className="relative py-32 bg-gradient-to-b from-white to-purple-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="faq" className="relative py-32 bg-white grid-bg">
+      <div className="max-w-4xl mx-auto px-6 lg:px-12">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Perguntas{' '}
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Frequentes
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600">
-            Tire suas dúvidas sobre o Thumdra
-          </p>
-        </motion.div>
+        <div className="mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block mb-6 -rotate-1"
+          >
+            <div className="px-5 py-2 bg-[#ffeb3b] brutal-border brutal-shadow-sm font-bold uppercase text-sm">
+              PERGUNTAS FREQUENTES
+            </div>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight"
+          >
+            DÚVIDAS?
+            <br />
+            <span className="text-[#00ff88]">RESPOSTAS.</span>
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-xl font-medium text-gray-700"
+          >
+            Tudo que você precisa saber sobre o Thumdra
+          </motion.p>
+        </div>
 
         {/* FAQ Items */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           {faqs.map((faq, index) => (
             <FAQItem key={index} faq={faq} index={index} />
           ))}
@@ -121,17 +138,25 @@ export default function FAQ() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-16 text-center"
+          className="mt-20 text-center"
         >
-          <p className="text-gray-600 mb-4">
-            Não encontrou o que procurava?
-          </p>
-          <a
-            href="mailto:suporte@thumdra.com.br"
-            className="inline-flex items-center gap-2 text-purple-600 font-semibold hover:text-purple-700 transition"
-          >
-            Entre em contato com nosso suporte →
-          </a>
+          <div className="inline-block bg-white brutal-border brutal-shadow p-8 rotate-1">
+            <p className="text-sm font-bold uppercase mb-4 text-gray-600">
+              NÃO ENCONTROU O QUE PROCURAVA?
+            </p>
+            <a
+              href="mailto:suporte@thumdra.com.br"
+              className="inline-block"
+            >
+              <motion.button
+                whileHover={{ x: 4, y: -4 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-4 bg-black text-[#00ff88] brutal-border-thick brutal-shadow font-extrabold uppercase text-sm tracking-wide hover:bg-gray-900 transition-colors"
+              >
+                FALAR COM SUPORTE →
+              </motion.button>
+            </a>
+          </div>
         </motion.div>
       </div>
     </section>

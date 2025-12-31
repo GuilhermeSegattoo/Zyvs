@@ -8,8 +8,7 @@ import {
   MessageSquare,
   TrendingUp,
   Zap,
-  Calendar,
-  Plus,
+  ArrowRight,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -17,39 +16,31 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      name: 'Total de Contatos',
+      name: 'Contatos',
       value: user?.organization?.currentContacts || 0,
       max: user?.organization?.maxContacts || 100,
       icon: Users,
-      color: 'from-blue-500 to-cyan-500',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-700',
+      color: '#00ff88',
     },
     {
       name: 'Flows Ativos',
       value: user?.organization?.currentFlows || 0,
       max: user?.organization?.maxFlows || 3,
       icon: Zap,
-      color: 'from-purple-500 to-pink-500',
-      bgColor: 'bg-purple-50',
-      textColor: 'text-purple-700',
+      color: '#ff3366',
     },
     {
-      name: 'Mensagens Este Mês',
+      name: 'Mensagens',
       value: user?.organization?.messagesThisMonth || 0,
       max: user?.organization?.maxMessagesPerMonth || 500,
       icon: MessageSquare,
-      color: 'from-green-500 to-emerald-500',
-      bgColor: 'bg-green-50',
-      textColor: 'text-green-700',
+      color: '#ffeb3b',
     },
     {
-      name: 'Taxa de Conversão',
+      name: 'Conversão',
       value: '0%',
       icon: TrendingUp,
-      color: 'from-yellow-500 to-orange-500',
-      bgColor: 'bg-yellow-50',
-      textColor: 'text-yellow-700',
+      color: '#00ff88',
     },
   ];
 
@@ -57,43 +48,36 @@ export default function DashboardPage() {
     {
       icon: Users,
       title: 'Adicionar Contatos',
-      description: 'Importe seus contatos ou adicione manualmente',
+      description: 'Importe ou adicione manualmente',
       href: '/clientes/novo',
-      color: 'from-blue-500 to-cyan-500',
     },
     {
       icon: Zap,
       title: 'Criar Automação',
-      description: 'Configure fluxos inteligentes de mensagens',
+      description: 'Configure fluxos inteligentes',
       href: '/automacoes/novo',
-      color: 'from-purple-500 to-pink-500',
     },
     {
       icon: MessageSquare,
       title: 'Nova Campanha',
-      description: 'Envie mensagens em massa para seus clientes',
+      description: 'Envie mensagens em massa',
       href: '/campanhas/nova/mensagem',
-      color: 'from-green-500 to-emerald-500',
     },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto p-8 space-y-8">
       {/* Welcome Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-8 text-white shadow-lg"
-      >
-        <h2 className="text-3xl font-bold mb-2">
-          Bem-vindo de volta, {user?.name?.split(' ')[0]}! 👋
-        </h2>
-        <p className="text-purple-100">
+      <div>
+        <h1 className="text-4xl font-extrabold text-black mb-2">
+          Olá, {user?.name?.split(' ')[0]} 👋
+        </h1>
+        <p className="text-gray-600 font-medium">
           {user?.role === 'ADMIN'
-            ? 'Você tem acesso total ao sistema. Use o botão "Painel Admin" na sidebar para gerenciar tudo.'
-            : 'Aqui está um resumo do seu negócio hoje.'}
+            ? 'Visão geral do sistema'
+            : 'Aqui está o resumo do seu negócio'}
         </p>
-      </motion.div>
+      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -103,18 +87,22 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+            className="bg-white border-2 border-black p-6 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`w-6 h-6 ${stat.textColor}`} />
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-10 h-10 flex items-center justify-center"
+                style={{ backgroundColor: stat.color }}
+              >
+                <stat.icon className="w-5 h-5 text-black" strokeWidth={2.5} />
               </div>
+              <p className="text-sm font-bold text-gray-600 uppercase tracking-wide">
+                {stat.name}
+              </p>
             </div>
-            <p className="text-sm font-medium text-gray-600 mb-1">
-              {stat.name}
-            </p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-gray-900">
+
+            <div className="flex items-baseline gap-2 mb-3">
+              <p className="text-3xl font-bold text-black">
                 {typeof stat.value === 'number'
                   ? stat.value.toLocaleString()
                   : stat.value}
@@ -123,11 +111,13 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-500">/ {stat.max}</p>
               )}
             </div>
+
             {stat.max && typeof stat.value === 'number' && (
-              <div className="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
+              <div className="bg-gray-100 h-2 overflow-hidden">
                 <div
-                  className={`h-full bg-gradient-to-r ${stat.color} transition-all duration-500`}
+                  className="h-full transition-all duration-500"
                   style={{
+                    backgroundColor: stat.color,
                     width: `${Math.min((stat.value / stat.max) * 100, 100)}%`,
                   }}
                 />
@@ -138,77 +128,66 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-      >
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">
-          Ações Rápidas
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <h2 className="text-2xl font-bold text-black mb-6">Ações Rápidas</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {quickActions.map((action, index) => (
             <Link key={action.title} href={action.href}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-                className="p-6 rounded-xl border-2 border-dashed border-gray-200 hover:border-purple-300 transition-all cursor-pointer group"
+                transition={{ delay: 0.3 + index * 0.1 }}
+                whileHover={{ y: -4 }}
+                className="bg-white border-2 border-gray-200 hover:border-black p-6 transition-all cursor-pointer group"
               >
-                <div
-                  className={`inline-flex p-3 rounded-lg bg-gradient-to-br ${action.color} mb-4`}
-                >
-                  <action.icon className="w-6 h-6 text-white" />
-                </div>
-                <h4 className="font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition">
+                <action.icon className="w-8 h-8 text-black mb-4" strokeWidth={2} />
+                <h3 className="font-bold text-black mb-2">
                   {action.title}
-                </h4>
+                </h3>
                 <p className="text-sm text-gray-600 mb-4">
                   {action.description}
                 </p>
-                <span className="text-sm text-purple-600 font-medium group-hover:underline">
-                  Em breve →
+                <span className="text-sm font-bold text-black group-hover:text-[#00ff88] transition flex items-center gap-2">
+                  Em breve
+                  <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
                 </span>
               </motion.div>
             </Link>
           ))}
         </div>
-      </motion.div>
+      </div>
 
       {/* Organization Info */}
       {user?.organization && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
-        >
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Sua Organização
-          </h3>
+        <div className="bg-gray-50 border-2 border-black p-6">
+          <h3 className="text-xl font-bold text-black mb-6">Sua Organização</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <p className="text-sm text-gray-500 mb-1">Nome</p>
-              <p className="font-medium text-gray-900">
+              <p className="text-xs font-bold uppercase text-gray-500 mb-2 tracking-wider">
+                Nome
+              </p>
+              <p className="font-bold text-black text-lg">
                 {user.organization.name}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">Plano</p>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+              <p className="text-xs font-bold uppercase text-gray-500 mb-2 tracking-wider">
+                Plano
+              </p>
+              <span className="inline-flex items-center px-3 py-1 bg-[#00ff88] border-2 border-black font-bold uppercase text-sm">
                 {user.organization.plan || 'FREE'}
               </span>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">Slug</p>
-              <p className="font-medium text-gray-900">
+              <p className="text-xs font-bold uppercase text-gray-500 mb-2 tracking-wider">
+                Slug
+              </p>
+              <p className="font-bold text-black text-lg">
                 {user.organization.slug}
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
     </div>
   );

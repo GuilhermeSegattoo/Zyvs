@@ -6,49 +6,53 @@ import Link from 'next/link';
 
 const plans = [
   {
-    name: 'STARTER',
-    price: '0',
-    period: 'GRÁTIS SEMPRE',
+    name: 'TESTE A',
+    price: '10',
+    period: '/MÊS',
     features: [
-      '100 contatos',
-      '2 flows',
-      '500 msg/mês',
+      '1.000 contatos',
+      '5 flows',
+      '2.000 msg/mês',
       'WhatsApp',
-      'Email support',
+      'Instagram',
+      'Email',
+      'Suporte padrão',
     ],
     color: 'bg-white',
     textColor: 'text-black',
   },
   {
-    name: 'PRO',
-    price: '147',
+    name: 'TESTE B',
+    price: '50',
     period: '/MÊS',
     features: [
-      'Tudo do Starter',
-      '5k contatos',
+      '5.000 contatos',
       '15 flows',
-      '15k msg/mês',
-      'WhatsApp + Instagram + Email',
+      '10.000 msg/mês',
+      'WhatsApp',
+      'Instagram',
+      'Email',
       'Suporte prioritário',
       'Analytics avançado',
-      'API access',
     ],
     color: 'bg-[#00ff88]',
     textColor: 'text-black',
     popular: true,
   },
   {
-    name: 'ENTERPRISE',
-    price: 'CUSTOM',
-    period: 'SOB MEDIDA',
+    name: 'TESTE C',
+    price: '100',
+    period: '/MÊS',
     features: [
-      'Tudo do Pro',
-      'Ilimitado',
-      'White-label',
-      'Suporte 24/7',
-      'Gerente dedicado',
-      'SLA 99.9%',
-      'Servidor dedicado',
+      '10.000 contatos',
+      '30 flows',
+      '25.000 msg/mês',
+      'WhatsApp',
+      'Instagram',
+      'Email',
+      'Suporte premium 24/7',
+      'Analytics avançado',
+      'API access',
     ],
     color: 'bg-black',
     textColor: 'text-white',
@@ -149,7 +153,7 @@ export default function Pricing() {
                         : 'bg-black text-white'
                     } brutal-border-thick brutal-shadow font-extrabold uppercase text-sm tracking-wider`}
                   >
-                    {plan.price === 'CUSTOM' ? 'FALAR COM VENDAS' : 'COMEÇAR AGORA'}
+                    COMEÇAR AGORA
                   </motion.button>
                 </Link>
               </div>
@@ -166,7 +170,7 @@ export default function Pricing() {
         >
           <div className="inline-block px-6 py-3 bg-white brutal-border brutal-shadow rotate-1">
             <p className="font-bold uppercase text-sm">
-              ✓ 14 DIAS GRÁTIS • ✓ SEM CARTÃO • ✓ CANCELE QUANDO QUISER
+              ✓ 14 DIAS GRÁTIS • ✓ CANCELE QUANDO QUISER • ✓ SUPORTE EM PORTUGUÊS
             </p>
           </div>
         </motion.div>

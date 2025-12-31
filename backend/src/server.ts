@@ -5,6 +5,7 @@ import jwt from '@fastify/jwt';
 import helmet from '@fastify/helmet';
 import { authRoutes } from './modules/auth/auth.routes';
 import { adminRoutes } from './modules/admin/admin.routes';
+import { billingRoutes } from './modules/billing/billing.routes';
 
 const fastify = Fastify({
   logger: process.env.NODE_ENV === 'development',
@@ -42,6 +43,7 @@ declare module '@fastify/jwt' {
 // Rotas
 fastify.register(authRoutes, { prefix: '/api/auth' });
 fastify.register(adminRoutes, { prefix: '/api/admin' });
+fastify.register(billingRoutes, { prefix: '/api/billing' });
 
 // Health check
 fastify.get('/health', async () => {

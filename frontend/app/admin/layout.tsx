@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   Users,
@@ -10,7 +9,8 @@ import {
   FileText,
   LogOut,
   Menu,
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { useRequireAdmin } from '@/hooks/useRequireAdmin';
@@ -35,10 +35,10 @@ export default function AdminLayout({
 
   if (isLoading || !isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">
+          <div className="w-12 h-12 border-4 border-black border-t-[#ff3366] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="font-bold text-sm">
             {isLoading ? 'Carregando...' : 'Verificando permissões...'}
           </p>
         </div>
@@ -58,31 +58,33 @@ export default function AdminLayout({
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r-2 border-black transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200">
+        <div className="h-16 flex items-center justify-between px-6 border-b-2 border-black">
           <Link href="/admin/dashboard">
-            <div className="flex items-center gap-2 cursor-pointer group">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center text-white font-bold">
-                T
+            <div className="flex items-center gap-2 cursor-pointer">
+              <div className="w-8 h-8 bg-black flex items-center justify-center">
+                <span className="text-[#ff3366] font-bold text-lg">T</span>
               </div>
               <div>
-                <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <span className="text-lg font-bold text-black">
                   Thumdra
                 </span>
-                <span className="block text-xs text-gray-500">Admin</span>
+                <span className="block text-xs font-bold text-gray-600 uppercase">
+                  Admin
+                </span>
               </div>
             </div>
           </Link>
 
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="lg:hidden text-gray-600 hover:text-black transition"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" strokeWidth={2} />
           </button>
         </div>
 
@@ -92,49 +94,46 @@ export default function AdminLayout({
             const isActive = pathname === item.href;
             return (
               <Link key={item.name} href={item.href}>
-                <motion.div
-                  whileHover={{ x: 4 }}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                <div
+                  className={`flex items-center gap-3 px-4 py-3 font-medium transition-all ${
                     isActive
-                      ? 'bg-purple-50 text-purple-700'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-[#ff3366] text-white border-l-4 border-black'
+                      : 'text-gray-700 hover:bg-gray-100 border-l-4 border-transparent'
                   }`}
                 >
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
-                </motion.div>
+                  <item.icon className="w-5 h-5" strokeWidth={2} />
+                  <span>{item.name}</span>
+                </div>
               </Link>
             );
           })}
         </nav>
 
         {/* User info and logout */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
-          <div className="flex items-center justify-between mb-3 px-2">
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {user?.name}
-              </p>
-              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-              <span className="inline-block mt-1 px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded">
-                Admin
-              </span>
-            </div>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t-2 border-black bg-white">
+          <div className="mb-4 px-2">
+            <p className="text-sm font-bold text-black truncate">
+              {user?.name}
+            </p>
+            <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+            <span className="inline-block mt-2 px-2 py-1 text-xs font-bold bg-[#ff3366] text-white">
+              ADMIN
+            </span>
           </div>
 
           <div className="space-y-2">
             <Link href="/dashboard">
-              <button className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-100 rounded-lg transition flex items-center gap-2">
-                <LayoutDashboard className="w-4 h-4" />
-                Ver Dashboard Normal
+              <button className="w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition flex items-center gap-2 font-medium justify-center">
+                <ArrowLeft className="w-4 h-4" strokeWidth={2} />
+                Dashboard Normal
               </button>
             </Link>
 
             <button
               onClick={logout}
-              className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50 rounded-lg transition flex items-center gap-2"
+              className="w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 transition flex items-center gap-2 font-medium justify-center"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4" strokeWidth={2} />
               Sair
             </button>
           </div>
@@ -144,23 +143,30 @@ export default function AdminLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <div className="sticky top-0 z-30 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+        <div className="sticky top-0 z-30 h-16 bg-white border-b-2 border-black flex items-center justify-between px-6">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-gray-500 hover:text-gray-700"
+            className="lg:hidden text-gray-600 hover:text-black transition"
           >
-            <Menu className="w-6 h-6" />
+            <Menu className="w-6 h-6" strokeWidth={2} />
           </button>
 
           <div className="flex-1 lg:flex-none">
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-lg font-bold text-black">
               Painel Administrativo
             </h1>
+          </div>
+
+          {/* Admin Badge */}
+          <div className="hidden lg:block">
+            <span className="px-3 py-1 bg-[#ff3366] text-white text-xs font-bold uppercase">
+              ADMIN
+            </span>
           </div>
         </div>
 
         {/* Page content */}
-        <main className="p-6">{children}</main>
+        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
       </div>
     </div>
   );

@@ -8,7 +8,8 @@ import {
   MessageSquare,
   TrendingUp,
   Activity,
-  Zap
+  Zap,
+  ArrowRight
 } from 'lucide-react';
 import { api } from '@/lib/api';
 
@@ -49,52 +50,40 @@ export default function AdminDashboard() {
 
   const statCards = [
     {
-      name: 'Total de Usuários',
+      name: 'Usuários',
       value: stats.totalUsers,
       icon: Users,
-      color: 'bg-blue-500',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-700',
+      color: '#00ff88',
     },
     {
       name: 'Organizações',
       value: stats.totalOrganizations,
       icon: Building2,
-      color: 'bg-purple-500',
-      bgColor: 'bg-purple-50',
-      textColor: 'text-purple-700',
+      color: '#ff3366',
     },
     {
       name: 'Contatos',
       value: stats.totalContacts,
       icon: Users,
-      color: 'bg-green-500',
-      bgColor: 'bg-green-50',
-      textColor: 'text-green-700',
+      color: '#ffeb3b',
     },
     {
-      name: 'Mensagens Enviadas',
+      name: 'Mensagens',
       value: stats.totalMessages,
       icon: MessageSquare,
-      color: 'bg-yellow-500',
-      bgColor: 'bg-yellow-50',
-      textColor: 'text-yellow-700',
+      color: '#00ff88',
     },
     {
-      name: 'Flows Ativos',
+      name: 'Flows',
       value: stats.activeFlows,
       icon: Zap,
-      color: 'bg-pink-500',
-      bgColor: 'bg-pink-50',
-      textColor: 'text-pink-700',
+      color: '#ff3366',
     },
     {
-      name: 'Campanhas Ativas',
+      name: 'Campanhas',
       value: stats.activeCampaigns,
       icon: Activity,
-      color: 'bg-indigo-500',
-      bgColor: 'bg-indigo-50',
-      textColor: 'text-indigo-700',
+      color: '#ffeb3b',
     },
   ];
 
@@ -102,19 +91,21 @@ export default function AdminDashboard() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando estatísticas...</p>
+          <div className="w-12 h-12 border-4 border-black border-t-[#00ff88] rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="font-bold text-sm">Carregando estatísticas...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto p-8 space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-        <p className="text-gray-600">
+        <h1 className="text-4xl font-extrabold text-black mb-2">
+          Painel Admin
+        </h1>
+        <p className="text-gray-600 font-medium">
           Visão geral do sistema
         </p>
       </div>
@@ -127,73 +118,86 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+            className="bg-white border-2 border-black p-6 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
-                  {stat.value.toLocaleString()}
-                </p>
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-10 h-10 flex items-center justify-center"
+                style={{ backgroundColor: stat.color }}
+              >
+                <stat.icon className="w-5 h-5 text-black" strokeWidth={2.5} />
               </div>
-              <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`w-6 h-6 ${stat.textColor}`} />
-              </div>
+              <p className="text-sm font-bold text-gray-600 uppercase tracking-wide">
+                {stat.name}
+              </p>
             </div>
+            <p className="text-3xl font-bold text-black">
+              {stat.value.toLocaleString()}
+            </p>
           </motion.div>
         ))}
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white border-2 border-black p-6">
+        <h2 className="text-2xl font-bold text-black mb-6">
           Atividades Recentes
-        </h3>
+        </h2>
         <div className="space-y-3">
-          <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="flex items-center gap-4 p-4 bg-gray-50">
+            <div className="w-3 h-3 bg-[#00ff88] rounded-full"></div>
             <div className="flex-1">
-              <p className="text-sm text-gray-900">Sistema operando normalmente</p>
-              <p className="text-xs text-gray-500">Todos os serviços ativos</p>
+              <p className="text-sm font-bold text-black">Sistema operando normalmente</p>
+              <p className="text-xs text-gray-600">Todos os serviços ativos</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Ações Rápidas
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <h2 className="text-2xl font-bold text-black mb-6">Ações Rápidas</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <motion.a
             href="/admin/users"
-            whileHover={{ scale: 1.02 }}
-            className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition cursor-pointer"
+            whileHover={{ y: -4 }}
+            className="bg-white border-2 border-gray-200 hover:border-black p-6 transition cursor-pointer group"
           >
-            <Users className="w-6 h-6 text-purple-600 mb-2" />
-            <p className="font-medium text-gray-900">Gerenciar Usuários</p>
-            <p className="text-sm text-gray-600">Ver e editar usuários</p>
+            <Users className="w-8 h-8 text-black mb-4" strokeWidth={2} />
+            <p className="font-bold text-black mb-2">Gerenciar Usuários</p>
+            <p className="text-sm text-gray-600 mb-4">Ver e editar usuários</p>
+            <span className="text-sm font-bold text-black group-hover:text-[#00ff88] transition flex items-center gap-2">
+              Acessar
+              <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
+            </span>
           </motion.a>
 
           <motion.a
             href="/admin/organizations"
-            whileHover={{ scale: 1.02 }}
-            className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition cursor-pointer"
+            whileHover={{ y: -4 }}
+            className="bg-white border-2 border-gray-200 hover:border-black p-6 transition cursor-pointer group"
           >
-            <Building2 className="w-6 h-6 text-blue-600 mb-2" />
-            <p className="font-medium text-gray-900">Organizações</p>
-            <p className="text-sm text-gray-600">Gerenciar organizações</p>
+            <Building2 className="w-8 h-8 text-black mb-4" strokeWidth={2} />
+            <p className="font-bold text-black mb-2">Organizações</p>
+            <p className="text-sm text-gray-600 mb-4">Gerenciar organizações</p>
+            <span className="text-sm font-bold text-black group-hover:text-[#00ff88] transition flex items-center gap-2">
+              Acessar
+              <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
+            </span>
           </motion.a>
 
           <motion.a
             href="/admin/logs"
-            whileHover={{ scale: 1.02 }}
-            className="p-4 bg-green-50 hover:bg-green-100 rounded-lg transition cursor-pointer"
+            whileHover={{ y: -4 }}
+            className="bg-white border-2 border-gray-200 hover:border-black p-6 transition cursor-pointer group"
           >
-            <Activity className="w-6 h-6 text-green-600 mb-2" />
-            <p className="font-medium text-gray-900">Logs do Sistema</p>
-            <p className="text-sm text-gray-600">Auditoria e logs</p>
+            <Activity className="w-8 h-8 text-black mb-4" strokeWidth={2} />
+            <p className="font-bold text-black mb-2">Logs do Sistema</p>
+            <p className="text-sm text-gray-600 mb-4">Auditoria e logs</p>
+            <span className="text-sm font-bold text-black group-hover:text-[#00ff88] transition flex items-center gap-2">
+              Acessar
+              <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
+            </span>
           </motion.a>
         </div>
       </div>

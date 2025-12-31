@@ -1,8 +1,10 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { AuthService } from './auth.service';
 import { registerSchema, loginSchema } from './auth.schema';
+import { BillingService } from '../billing/billing.service';
 
 const authService = new AuthService();
+const billingService = new BillingService();
 
 export async function register(req: FastifyRequest, reply: FastifyReply) {
   try {
@@ -16,9 +18,13 @@ export async function register(req: FastifyRequest, reply: FastifyReply) {
       organizationId: user.organizationId,
     });
 
+    // Criar sessão de checkout no Stripe
+    const session = await billingService.createCheckoutSession(user.id, data.plan);
+
     return reply.status(201).send({
       user,
       token,
+      checkoutUrl: session.url,
     });
   } catch (error: any) {
     if (error.name === 'ZodError') {

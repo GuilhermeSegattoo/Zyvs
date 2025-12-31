@@ -33,14 +33,13 @@ export default function FloatingHero() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-7xl md:text-[clamp(4rem,12vw,10rem)] font-extrabold leading-[0.9] mb-8"
             >
-              <span className="block">RELACIONA-</span>
-              <span className="block text-[#00ff88] -ml-2 mt-2">MENTOS</span>
-              <span className="block mt-2">QUE GERAM</span>
+              <span className="block">O CRM QUE</span>
               <span className="block relative inline-block mt-2">
-                <span className="bg-[#ff3366] text-white px-4 brutal-border brutal-shadow rotate-1 inline-block">
-                  RESULTADOS
+                <span className="bg-[#00ff88] text-black px-4 brutal-border brutal-shadow -rotate-1 inline-block">
+                  AUTOMATIZA
                 </span>
               </span>
+              <span className="block mt-2">TUDO</span>
             </motion.h1>
 
             <motion.p

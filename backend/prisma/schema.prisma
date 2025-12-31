@@ -22,9 +22,12 @@ enum UserRole {
 
 enum Plan {
   FREE
-  PRO
-  BUSINESS
-  ENTERPRISE
+  TESTE_A
+  TESTE_B
+  TESTE_C
+  PRO          // Manter para compatibilidade
+  BUSINESS     // Manter para compatibilidade
+  ENTERPRISE   // Manter para compatibilidade
 }
 
 model User {
@@ -48,6 +51,11 @@ model User {
   // Limites atuais (reset mensal)
   messagesUsedThisMonth   Int @default(0)
   flowExecutionsThisMonth Int @default(0)
+
+  // Stripe Integration
+  stripeCustomerId      String?   @unique
+  stripeSubscriptionId  String?   @unique
+  stripeCurrentPeriodEnd DateTime?
 
   // Timestamps
   createdAt     DateTime  @default(now())
