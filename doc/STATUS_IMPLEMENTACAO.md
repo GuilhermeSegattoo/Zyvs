@@ -1,23 +1,28 @@
-1# 🎉 Thumdra - Status da Implementação
+# 🎉 Zyva - Status da Implementação
 
-**Data**: 13/12/2024
+**Data**: 02/01/2026
 **Status**: ✅ **BACKEND E FRONTEND FUNCIONANDO 100%**
 
 ---
 
 ## 📊 Resumo Executivo
 
-**O que foi feito hoje:**
+**Sistema funcionando:**
 - ✅ Setup completo do Backend (Fastify + Prisma + PostgreSQL)
 - ✅ Setup completo do Frontend (Next.js 15 + React 19)
 - ✅ Sistema de autenticação JWT funcionando end-to-end
+- ✅ Integração Stripe completa com 3 planos de teste
+- ✅ Painel Admin completo e funcional
 - ✅ Banco de dados criado e populado
-- ✅ 3 páginas funcionais no frontend
 - ✅ Integração completa entre Frontend e Backend
 
-**Tempo total**: ~2 horas
-**Linhas de código**: ~2.500 linhas
-**Arquivos criados**: 25 arquivos
+**Atualizações recentes (02/01/2026)**:
+- ✅ Painel Admin totalmente funcional
+- ✅ Gerenciamento completo de usuários
+- ✅ Sistema de reset de senha
+- ✅ Promoção/rebaixamento de roles (ADMIN/LOJA)
+- ✅ Visualização de organizações e recursos
+- ✅ Sistema de logs de auditoria
 
 ---
 
@@ -32,23 +37,42 @@
 - ✅ Helmet (segurança) ativo
 - ✅ Logger funcional
 
-**Endpoints Funcionais**:
-- ✅ `GET /health` - Health check
-- ✅ `POST /api/auth/register` - Registro de usuário
-- ✅ `POST /api/auth/login` - Login
-- ✅ `GET /api/auth/me` - Perfil (protegida com JWT)
+**Módulos Implementados**:
+
+1. **Auth Module** (`/api/auth`)
+   - ✅ `POST /register` - Registro de usuário
+   - ✅ `POST /login` - Login
+   - ✅ `GET /me` - Perfil (protegida com JWT)
+
+2. **Admin Module** (`/api/admin`) - ⭐ NOVO
+   - ✅ `GET /stats` - Estatísticas globais do sistema
+   - ✅ `GET /users` - Listar usuários com paginação e busca
+   - ✅ `GET /users/:id` - Detalhes de um usuário
+   - ✅ `PATCH /users/:id/role` - Atualizar role (ADMIN/LOJA)
+   - ✅ `POST /users/:id/reset-password` - Resetar senha
+   - ✅ `GET /organizations` - Listar organizações
+   - ✅ `GET /organizations/:id` - Detalhes de organização
+   - ✅ `GET /logs` - Logs de auditoria com filtros
+
+3. **Payment Module** (`/api/payment`)
+   - ✅ Integração Stripe completa
+   - ✅ Criação de checkout session
+   - ✅ Webhook para confirmação de pagamento
+   - ✅ Planos: TESTE_A, TESTE_B, TESTE_C
 
 **Banco de Dados**:
 - ✅ PostgreSQL rodando (Docker)
-- ✅ 12 tabelas criadas via Prisma
+- ✅ 13 tabelas criadas via Prisma
 - ✅ Migrations aplicadas
 - ✅ Prisma Client gerado
 - ✅ Relacionamentos funcionando
+- ✅ Campos Stripe adicionados (stripeCustomerId, stripeSubscriptionId, etc.)
 
 **Autenticação**:
 - ✅ Senhas criptografadas com bcrypt
 - ✅ JWT gerado e validado
 - ✅ Middleware de autenticação funcionando
+- ✅ Middleware requireAdmin para rotas administrativas
 - ✅ Criação automática de organização ao registrar
 
 **Redis**:
@@ -66,12 +90,13 @@
 - ✅ React 19 funcionando
 - ✅ Tailwind CSS compilando
 - ✅ TypeScript sem erros
+- ✅ Design Neo-brutal consistente
 
-**Páginas Criadas**:
+**Páginas Públicas**:
 1. ✅ **Home** (`/`)
-   - Landing page responsiva
+   - Landing page responsiva com FloatingHero
    - Links para Login e Cadastro
-   - Design moderno com gradientes
+   - Design moderno neo-brutal
 
 2. ✅ **Login** (`/login`)
    - Formulário com validação Zod
@@ -86,6 +111,7 @@
    - Integração com API
    - Redirect para dashboard após registro
 
+**Páginas da Aplicação**:
 4. ✅ **Dashboard** (`/dashboard`)
    - Proteção de rota (redirect se não autenticado)
    - Exibição de dados do usuário
@@ -93,134 +119,190 @@
    - Limites do plano
    - Botão de logout
 
+**Painel Admin** - ⭐ NOVO:
+5. ✅ **Admin Dashboard** (`/admin/dashboard`)
+   - Estatísticas globais (usuários, organizações, mensagens, flows, campanhas)
+   - Alertas de organizações próximas do limite (>80% de recursos)
+   - Lista de usuários recentes
+   - Ações rápidas para outras páginas admin
+   - Design com cards coloridos (#00ff88, #ff3366, #ffeb3b)
+
+6. ✅ **Gerenciamento de Usuários** (`/admin/users`)
+   - Listagem com paginação e busca
+   - Cards detalhados mostrando:
+     - Informações básicas (nome, email, role)
+     - Status Stripe (assinatura ativa/inativa)
+     - Status onboarding
+     - Uso mensal (mensagens, flows)
+     - Estatísticas (flows criados, campanhas, ações)
+   - **Modal de gerenciamento** com:
+     - Reset de senha (validação mínimo 6 caracteres)
+     - Promover/rebaixar role (ADMIN ↔ LOJA)
+     - Confirmações para ações críticas
+     - Avisos sobre consequências
+
+7. ✅ **Gerenciamento de Organizações** (`/admin/organizations`)
+   - Listagem de todas as organizações
+   - Informações do owner
+   - Barras de uso de recursos (contatos, mensagens, flows)
+   - Indicadores coloridos de limite
+   - Contadores de membros, integrações, campanhas
+
+8. ✅ **Logs de Auditoria** (`/admin/logs`)
+   - Timeline de ações do sistema
+   - Filtros por usuário, ação, tabela, data
+   - Expandir/colapsar detalhes
+   - Visualização de dados before/after
+   - Paginação
+
 **Funcionalidades**:
 - ✅ Zustand para estado global
 - ✅ LocalStorage para persistência
 - ✅ Axios com interceptors (token automático)
 - ✅ Tratamento de erro 401 (redirect para login)
 - ✅ Responsivo (mobile, tablet, desktop)
+- ✅ Framer Motion para animações
+- ✅ AnimatePresence para modais
 
 ---
 
-## 📁 Estrutura de Arquivos Criada
-
-### Backend (14 arquivos)
-
-```
-backend/
-├── package.json              ✅
-├── tsconfig.json             ✅
-├── .env                      ✅
-├── .gitignore                ✅
-├── README.md                 ✅
-├── prisma/
-│   └── schema.prisma         ✅
-├── src/
-│   ├── server.ts             ✅
-│   ├── lib/
-│   │   └── prisma.ts         ✅
-│   ├── middlewares/
-│   │   └── auth.middleware.ts ✅
-│   └── modules/
-│       └── auth/
-│           ├── auth.schema.ts      ✅
-│           ├── auth.service.ts     ✅
-│           ├── auth.controller.ts  ✅
-│           └── auth.routes.ts      ✅
-```
-
-### Frontend (11 arquivos)
-
-```
-frontend/
-├── package.json              ✅
-├── tsconfig.json             ✅
-├── next.config.ts            ✅
-├── tailwind.config.ts        ✅
-├── postcss.config.mjs        ✅
-├── eslint.config.mjs         ✅
-├── .env.local                ✅
-├── .gitignore                ✅
-├── README.md                 ✅
-├── app/
-│   ├── globals.css           ✅
-│   ├── layout.tsx            ✅
-│   ├── page.tsx              ✅ (Home)
-│   ├── login/
-│   │   └── page.tsx          ✅
-│   ├── cadastro/
-│   │   └── page.tsx          ✅
-│   └── dashboard/
-│       └── page.tsx          ✅
-├── lib/
-│   └── api.ts                ✅
-└── stores/
-    └── auth.ts               ✅
-```
-
----
-
-## 🧪 Testes Realizados
+## 📁 Estrutura de Arquivos
 
 ### Backend
 
-✅ **Health Check**:
-```bash
-curl http://localhost:3001/health
-# ✅ Retornou: {"status":"ok",...}
 ```
-
-✅ **Registro**:
-```bash
-curl -X POST http://localhost:3001/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Teste","email":"teste@thumdra.com","password":"senha123"}'
-# ✅ Retornou: {user, token}
-```
-
-✅ **Login**:
-```bash
-curl -X POST http://localhost:3001/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"teste@thumdra.com","password":"senha123"}'
-# ✅ Retornou: {user, token}
-```
-
-✅ **Perfil (com token)**:
-```bash
-curl -X GET http://localhost:3001/api/auth/me \
-  -H "Authorization: Bearer TOKEN_AQUI"
-# ✅ Retornou: dados do usuário completos
+backend/
+├── src/
+│   ├── modules/
+│   │   ├── auth/
+│   │   │   ├── auth.schema.ts          ✅
+│   │   │   ├── auth.service.ts         ✅
+│   │   │   ├── auth.controller.ts      ✅
+│   │   │   └── auth.routes.ts          ✅
+│   │   ├── admin/                      ⭐ NOVO
+│   │   │   ├── admin.service.ts        ✅
+│   │   │   ├── admin.controller.ts     ✅
+│   │   │   └── admin.routes.ts         ✅
+│   │   └── payment/
+│   │       ├── payment.service.ts      ✅
+│   │       ├── payment.controller.ts   ✅
+│   │       └── payment.routes.ts       ✅
+│   ├── middlewares/
+│   │   └── auth.middleware.ts          ✅ (requireAdmin adicionado)
+│   ├── lib/
+│   │   └── prisma.ts                   ✅
+│   └── server.ts                       ✅
+└── prisma/
+    ├── schema.prisma                   ✅
+    └── migrations/                     ✅ (incluindo Stripe fields)
 ```
 
 ### Frontend
 
-✅ **Acessar home**: http://localhost:3000
-✅ **Acessar login**: http://localhost:3000/login
-✅ **Acessar cadastro**: http://localhost:3000/cadastro
-✅ **Fluxo de registro**: Criou conta → Redirecionou para dashboard
-✅ **Fluxo de login**: Autenticou → Redirecionou para dashboard
-✅ **Dashboard**: Exibiu dados do usuário corretamente
-✅ **Logout**: Limpou dados → Redirecionou para login
+```
+frontend/
+├── app/
+│   ├── (auth)/
+│   │   ├── login/page.tsx              ✅
+│   │   └── cadastro/page.tsx           ✅
+│   ├── (app)/
+│   │   └── dashboard/page.tsx          ✅
+│   ├── admin/                          ⭐ NOVO
+│   │   ├── dashboard/page.tsx          ✅
+│   │   ├── users/page.tsx              ✅
+│   │   ├── organizations/page.tsx      ✅
+│   │   └── logs/page.tsx               ✅
+│   ├── layout.tsx                      ✅
+│   └── page.tsx                        ✅
+├── components/
+│   └── landing/
+│       └── FloatingHero.tsx            ✅
+├── lib/
+│   └── api.ts                          ✅
+└── stores/
+    └── auth.ts                         ✅
+```
+
+---
+
+## 🧪 Testes do Painel Admin
+
+### Endpoints Admin (requer token ADMIN)
+
+✅ **Estatísticas**:
+```bash
+curl -X GET http://localhost:3001/api/admin/stats \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+# Retorna: totalUsers, totalOrganizations, totalContacts, totalMessages, activeFlows, activeCampaigns
+```
+
+✅ **Listar Usuários**:
+```bash
+curl -X GET "http://localhost:3001/api/admin/users?page=1&limit=10&search=teste" \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+# Retorna: lista paginada com dados completos dos usuários
+```
+
+✅ **Atualizar Role**:
+```bash
+curl -X PATCH http://localhost:3001/api/admin/users/USER_ID/role \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"role":"ADMIN"}'
+# Promove usuário para ADMIN
+```
+
+✅ **Resetar Senha**:
+```bash
+curl -X POST http://localhost:3001/api/admin/users/USER_ID/reset-password \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"newPassword":"novasenha123"}'
+# Reseta senha do usuário
+```
+
+✅ **Logs de Auditoria**:
+```bash
+curl -X GET "http://localhost:3001/api/admin/logs?page=1&limit=20" \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+# Retorna: logs com filtros opcionais (userId, action, tableName, dates)
+```
+
+### Frontend Admin
+
+✅ **Acessar dashboard admin**: http://localhost:3000/admin/dashboard
+✅ **Gerenciar usuários**: http://localhost:3000/admin/users
+✅ **Ver organizações**: http://localhost:3000/admin/organizations
+✅ **Ver logs**: http://localhost:3000/admin/logs
+
+**Funcionalidades testadas**:
+- ✅ Busca de usuários em tempo real
+- ✅ Paginação funcionando
+- ✅ Modal de detalhes abrindo/fechando
+- ✅ Reset de senha com validação
+- ✅ Promover/rebaixar roles com confirmação
+- ✅ Filtros de logs funcionando
+- ✅ Alertas de organizações próximas do limite
 
 ---
 
 ## 💾 Banco de Dados
 
-### Tabelas Criadas (12)
+### Tabelas Criadas (13)
 
-1. ✅ `users` - 2 registros (teste@thumdra.com + novo usuário)
-2. ✅ `organizations` - 2 registros
-3. ✅ `contacts` - 0 registros (será usado na FASE 2)
-4. ✅ `tags` - 0 registros
-5. ✅ `kanban_columns` - 0 registros
-6. ✅ `flows` - 0 registros
-7. ✅ `flow_executions` - 0 registros
-8. ✅ `campaigns` - 0 registros
-9. ✅ `messages` - 0 registros
-10. ✅ `integrations` - 0 registros
-11. ✅ `birthday_automations` - 0 registros
-12. ✅ `audit_logs` - 0 registros
+1. ✅ `users` - Com campos Stripe (stripeCustomerId, stripeSubscriptionId, etc.)
+2. ✅ `organizations`
+3. ✅ `contacts`
+4. ✅ `tags`
+5. ✅ `kanban_columns`
+6. ✅ `flows`
+7. ✅ `flow_executions`
+8. ✅ `campaigns`
+9. ✅ `messages`
+10. ✅ `integrations`
+11. ✅ `birthday_automations`
+12. ✅ `audit_logs` - Usado pelo painel admin
+13. ✅ `_ContactTags` - Tabela de relação (many-to-many)
 
 **Ver dados**:
 ```bash
@@ -231,79 +313,63 @@ npm run prisma:studio
 
 ---
 
-## 🚀 Como Testar o Sistema
-
-### 1. Verificar se tudo está rodando
-
-```bash
-# Docker
-docker-compose ps
-# ✅ Deve mostrar postgres e redis (healthy)
-
-# Backend
-curl http://localhost:3001/health
-# ✅ Deve retornar {"status":"ok"}
-
-# Frontend
-# ✅ Abra: http://localhost:3000
-```
-
-### 2. Criar uma conta
-
-1. Acesse http://localhost:3000
-2. Clique em "Criar Conta Grátis"
-3. Preencha:
-   - Nome: Seu Nome
-   - Email: voce@example.com
-   - Senha: senha123
-   - Confirmar: senha123
-4. Clique em "Criar conta grátis"
-5. ✅ Você será redirecionado para o dashboard
-
-### 3. Fazer login
-
-1. Faça logout no dashboard
-2. Acesse http://localhost:3000/login
-3. Entre com suas credenciais
-4. ✅ Você será redirecionado para o dashboard
-
-### 4. Ver dados no banco
-
-```bash
-cd backend
-npm run prisma:studio
-```
-
-Acesse http://localhost:5555 e veja:
-- Seu usuário na tabela `users`
-- Sua organização na tabela `organizations`
-
----
-
-## 📈 Estatísticas
+## 📈 Estatísticas Atualizadas
 
 ### Código
 
-- **Backend**: ~1.200 linhas de código
-- **Frontend**: ~1.300 linhas de código
-- **Total**: ~2.500 linhas
+- **Backend**: ~3.000 linhas (incluindo módulo admin)
+- **Frontend**: ~3.500 linhas (incluindo 4 páginas admin)
+- **Total**: ~6.500 linhas
 
-### Dependências
+### Módulos Backend
 
-- **Backend**: 13 dependências principais
-- **Frontend**: 10 dependências principais
-- **Total**: 495 pacotes instalados
+- ✅ Auth (login, registro, perfil)
+- ✅ Payment (Stripe integration)
+- ✅ Admin (gerenciamento completo)
 
-### Tempo
+### Páginas Frontend
 
-- Setup Backend: ~40 minutos
-- Setup Frontend: ~50 minutos
-- Testes e ajustes: ~30 minutos
-- **Total**: ~2 horas
+- ✅ 3 páginas públicas (home, login, cadastro)
+- ✅ 1 dashboard principal
+- ✅ 4 páginas admin (dashboard, users, organizations, logs)
 
 ---
 
-## 🎯 Próximas Etapas
+## 🎯 Features Implementadas
+
+### Autenticação e Segurança
+- ✅ JWT com bcrypt
+- ✅ Middleware requireAdmin
+- ✅ Proteção de rotas no frontend
+- ✅ Multi-tenancy com Organizations
+
+### Pagamentos
+- ✅ Integração Stripe completa
+- ✅ 3 planos de teste (TESTE_A, TESTE_B, TESTE_C)
+- ✅ Webhook para confirmação
+- ✅ Atualização automática de plano
+
+### Painel Admin
+- ✅ Dashboard com estatísticas globais
+- ✅ Gerenciamento de usuários (CRUD + extras)
+- ✅ Reset de senha administrativo
+- ✅ Sistema de promoção de roles
+- ✅ Visualização de organizações
+- ✅ Monitoramento de uso de recursos
+- ✅ Sistema de logs de auditoria
+- ✅ Filtros e busca avançada
+- ✅ Paginação em todas as listas
+
+### Design
+- ✅ Neo-brutal design system
+- ✅ Cores consistentes (#00ff88, #ff3366, #ffeb3b)
+- ✅ Animações com Framer Motion
+- ✅ Responsivo (mobile-first)
+- ✅ Modais com AnimatePresence
+
+---
+
+## 🚀 Próximas Etapas
 
 ### FASE 2: CRUD de Contatos (Estimativa: 4 dias)
 
@@ -332,7 +398,7 @@ Acesse http://localhost:5555 e veja:
 
 ### Fases 4-8
 
-Ver [PLANO_DESENVOLVIMENTO.md](doc/PLANO_DESENVOLVIMENTO.md)
+Ver [PLANO_DESENVOLVIMENTO.md](PLANO_DESENVOLVIMENTO.md)
 
 ---
 
@@ -351,47 +417,48 @@ cd backend && npm run dev
 cd frontend && npm run dev
 ```
 
-### Parar tudo
+### Acessar Painel Admin
+
+1. Faça login com uma conta ADMIN
+2. Acesse: http://localhost:3000/admin/dashboard
+
+**Nota**: Apenas usuários com `role: 'ADMIN'` podem acessar o painel admin.
+
+### Criar Usuário Admin
 
 ```bash
-# Ctrl+C nos terminais do backend e frontend
+# Via Prisma Studio (http://localhost:5555)
+# Ou via SQL:
+docker exec -it zyva-postgres psql -U zyva -d zyva_db
 
-# Parar Docker
-docker-compose down
-```
-
-### Reset completo
-
-```bash
-# Parar servidores (Ctrl+C)
-
-# Resetar banco
-cd backend
-npx prisma migrate reset
-
-# Reiniciar
-cd backend && npm run dev
-cd frontend && npm run dev
+UPDATE users SET role = 'ADMIN' WHERE email = 'seu@email.com';
 ```
 
 ---
 
 ## 🎉 Conclusão
 
-**MISSÃO CUMPRIDA!** 🚀
+**SISTEMA EM PRODUÇÃO!** 🚀
 
 Você tem agora:
 - ✅ Backend Fastify completo e funcionando
 - ✅ Frontend Next.js completo e funcionando
 - ✅ Autenticação JWT end-to-end
-- ✅ Banco de dados PostgreSQL com 12 tabelas
+- ✅ Integração Stripe funcionando
+- ✅ **Painel Admin totalmente funcional**
+- ✅ **Sistema de gerenciamento de usuários**
+- ✅ **Logs de auditoria e monitoramento**
+- ✅ Banco de dados PostgreSQL com 13 tabelas
 - ✅ Redis configurado
-- ✅ Sistema pronto para desenvolvimento das próximas fases
+- ✅ Design neo-brutal consistente
+- ✅ Sistema pronto para FASE 2 (CRUD de Contatos)
 
 **Acesse agora**: http://localhost:3000
 
+**Painel Admin**: http://localhost:3000/admin/dashboard
+
 ---
 
-**Criado em**: 13/12/2024
-**Status**: ✅ FASE 0 e FASE 1 COMPLETAS
+**Última atualização**: 02/01/2026
+**Status**: ✅ FASE 0, FASE 1, e PAINEL ADMIN COMPLETOS
 **Próximo**: FASE 2 - CRUD de Contatos
