@@ -31,18 +31,16 @@ export function ImportDropzone({ onFileAccepted, onDownloadTemplate }: ImportDro
   return (
     <div className="space-y-6">
       {/* Dropzone */}
-      <motion.div
+      <div
         {...getRootProps()}
         className={`
           relative border-4 border-dashed rounded-xl p-12 text-center cursor-pointer
           transition-all duration-200
           ${isDragActive
             ? 'border-[#00ff88] bg-[#00ff88]/5 scale-105'
-            : 'border-black/20 hover:border-[#00ff88]/50 hover:bg-[#00ff88]/5'
+            : 'border-black/20 hover:border-[#00ff88]/50 hover:bg-[#00ff88]/5 hover:scale-[1.02] active:scale-[0.98]'
           }
         `}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
       >
         <input {...getInputProps()} />
 
@@ -70,7 +68,7 @@ export function ImportDropzone({ onFileAccepted, onDownloadTemplate }: ImportDro
             </p>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* File Rejections */}
       {fileRejections.length > 0 && (
