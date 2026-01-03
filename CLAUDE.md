@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Zyva** is a SaaS CRM platform for automating customer relationship processes, integrating contacts management, visual automation flows, Kanban pipeline, and multi-channel messaging (WhatsApp, Email, Instagram).
+**Thumdra** is a SaaS CRM platform for automating customer relationship processes, integrating contacts management, visual automation flows, Kanban pipeline, and multi-channel messaging (WhatsApp, Email, Instagram).
 
 ## Tech Stack
 
@@ -14,13 +14,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Cache/Queues**: Redis 7 + BullMQ 5.x
 - **Authentication**: JWT with @fastify/jwt
 - **Validation**: Zod 3.x
+- **Payments**: Stripe integration
 
 ### Frontend
 - **Framework**: Next.js 15 (App Router) with React 19
-- **Styling**: Tailwind CSS 3.x
+- **Styling**: Tailwind CSS 3.x + Shadcn/UI components
 - **State Management**: Zustand 5.x
 - **Data Fetching**: Tanstack Query 5.x
 - **Forms**: React Hook Form 7.x + Zod validation
+- **Icons**: Lucide React
 
 ### Infrastructure
 - **Development**: Docker Compose (PostgreSQL + Redis containers)
@@ -28,50 +30,65 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Key Commands
 
+### Root Directory Commands
+
+```bash
+# Install all dependencies (root + backend + frontend)
+npm run install:all
+
+# Start both backend and frontend concurrently
+npm run dev
+
+# Docker management
+npm run docker:up        # Start PostgreSQL + Redis
+npm run docker:down      # Stop all services
+npm run docker:logs      # Follow logs
+```
+
 ### Backend (from `backend/` directory)
 
 ```bash
 # Development
-npm run dev                    # Start dev server with tsx watch (http://localhost:3001)
+npm run dev              # Start dev server with tsx watch (http://localhost:3001)
 
 # Database
-npm run prisma:migrate        # Create and apply new migration
-npm run prisma:generate       # Generate Prisma Client after schema changes
-npm run prisma:studio         # Open Prisma Studio GUI (http://localhost:5555)
-npm run prisma:reset          # Reset database (DESTRUCTIVE - use with caution)
+npm run prisma:migrate   # Create and apply new migration
+npm run prisma:generate  # Generate Prisma Client after schema changes
+npm run prisma:studio    # Open Prisma Studio GUI (http://localhost:5555)
+npm run prisma:reset     # Reset database (DESTRUCTIVE - use with caution)
 
 # Build
-npm run build                 # Compile TypeScript to dist/
-npm start                     # Run production build
+npm run build            # Compile TypeScript to dist/
+npm start                # Run production build
 ```
 
 ### Frontend (from `frontend/` directory)
 
 ```bash
 # Development
-npm run dev                   # Start Next.js dev server (http://localhost:3000)
+npm run dev              # Start Next.js dev server (http://localhost:3000)
 
 # Build
-npm run build                 # Production build
-npm start                     # Serve production build
-npm run lint                  # Run ESLint
+npm run build            # Production build
+npm start                # Serve production build
+npm run lint             # Run ESLint
 ```
 
 ### Docker (from root directory)
 
 ```bash
 # Core services
-docker-compose up -d          # Start PostgreSQL + Redis
-docker-compose down           # Stop all services
-docker-compose ps             # Check container status
-docker-compose logs -f        # Follow logs
+docker-compose up -d                    # Start PostgreSQL + Redis
+docker-compose down                     # Stop all services
+docker-compose ps                       # Check container status
+docker-compose logs -f                  # Follow logs
 
-# With admin tools
-docker-compose --profile tools up -d    # Include pgAdmin + Redis Commander
+# With admin tools (pgAdmin + Redis Commander)
+docker-compose --profile tools up -d    # Include admin UIs
 
 # Database access
-docker exec -it zyva-postgres psql -U zyva -d zyva_db    # PostgreSQL CLI
-docker exec -it zyva-redis redis-cli                      # Redis CLI
+docker exec -it thumdra-postgres psql -U thumdra -d thumdra_db    # PostgreSQL CLI
+docker exec -it thumdra-redis redis-cli                           # Redis CLI
 ```
 
 ## Architecture
@@ -82,7 +99,7 @@ The backend follows a **modular architecture** where each feature is organized i
 
 ```
 backend/src/
-├── modules/              # Feature modules (auth, contacts, flows, campaigns, etc.)
+├── modules/              # Feature modules (auth, contacts, admin, billing, tags)
 │   └── [module]/
 │       ├── [module].schema.ts      # Zod validation schemas
 │       ├── [module].service.ts     # Business logic
@@ -91,13 +108,20 @@ backend/src/
 ├── integrations/         # External API integrations (WhatsApp, Instagram, Email)
 ├── jobs/                 # BullMQ queues and workers
 │   ├── queues/          # Job queue definitions
-│   └── workers/         # Job processors
+│   └── workers/         # Job processors (e.g., contact-import.worker.ts)
 ├── middlewares/          # Fastify middleware (auth, error handling, rate limiting)
 ├── lib/                  # Shared utilities (prisma client, redis client, logger)
 └── server.ts            # Application entry point
 ```
 
 **Module Pattern**: Each module exports routes that are registered in `server.ts` with a prefix (e.g., `/api/auth`, `/api/contacts`). Controllers handle HTTP logic, services contain business logic and database operations.
+
+**Current Modules**:
+- `auth` - User authentication (register, login, JWT)
+- `admin` - Admin panel functionality
+- `billing` - Stripe subscription management
+- `contacts` - CRM contacts CRUD with CSV/Excel import
+- `tags` - Contact tagging and segmentation
 
 ### Frontend Structure
 
@@ -109,10 +133,10 @@ frontend/app/
 ├── (app)/               # Protected dashboard pages
 │   ├── layout.tsx      # Shared layout with navigation
 │   ├── dashboard/      # Main dashboard
-│   ├── clientes/       # Contacts management
-│   ├── automacoes/     # Flow builder
-│   ├── pipeline/       # Kanban view
-│   └── campanhas/      # Campaigns
+│   │   ├── page.tsx
+│   │   └── clientes/   # Contacts management UI
+│   ├── admin/          # Admin panel
+│   └── pricing/        # Pricing/subscription pages
 ├── layout.tsx          # Root layout
 └── page.tsx            # Landing page
 ```
@@ -126,7 +150,7 @@ frontend/app/
 
 **Multi-tenancy model**: Users belong to Organizations. Key entities:
 
-- `User` + `Organization` - Authentication and multi-tenancy (ADMIN/LOJA roles)
+- `User` + `Organization` - Authentication and multi-tenancy with roles (ADMIN/LOJA)
 - `Contact` - CRM contacts with custom fields, tags, Kanban position
 - `Tag` - Segmentation tags (many-to-many with Contacts)
 - `KanbanColumn` - Pipeline stages for contacts
@@ -134,12 +158,16 @@ frontend/app/
 - `Campaign` + `Message` - Bulk messaging campaigns with delivery tracking
 - `Integration` - External API credentials (WhatsApp, Instagram, Email)
 - `BirthdayAutomation` - Automated birthday message configuration
+- `AuditLog` - System audit trail
 
 **Important relationships**:
-- User → Organization (one-to-one, user.organizationId)
-- Contact → Organization via User (contacts are organization-scoped)
+- User → Organization (many-to-one via `organizationId`, except for ADMIN users)
+- User can own Organizations (one-to-many via `ownerId` on Organization)
+- Contact → Organization (organization-scoped via User)
 - Flow nodes stored as JSON (`nodes` and `edges` columns)
 - Custom fields on Contact stored as JSON
+
+**Plan System**: Three test plans (TESTE_A, TESTE_B, TESTE_C) plus legacy plans (FREE, PRO, BUSINESS, ENTERPRISE) with usage limits enforced at Organization level.
 
 ### Authentication Flow
 
@@ -150,13 +178,21 @@ frontend/app/
 
 Location: `backend/src/middlewares/auth.middleware.ts`
 
+### Rate Limiting & Security
+
+- Global rate limit: 100 requests per minute per IP/user
+- Rate limits configurable per-route
+- Helmet for security headers with CSP
+- JWT expiration and refresh token support
+- Rate limiting uses Redis for distributed state
+
 ## Development Workflow
 
 ### Creating New Features
 
 Follow this pattern when adding features:
 
-1. **Database**: Add Prisma models to `backend/prisma/schema.prisma`, run `npm run prisma:migrate`
+1. **Database**: Add Prisma models to `backend/prisma/schema.prisma`, run `npm run prisma:migrate` from backend/
 2. **Backend Module**:
    - Create `schema.ts` with Zod validators for input/output
    - Create `service.ts` with business logic (Prisma operations)
@@ -181,7 +217,7 @@ Verify database state: `npm run prisma:studio` (from backend/)
 
 **Error Handling**: Services throw errors with descriptive messages. Controllers catch and return appropriate HTTP status codes.
 
-**Async Jobs**: Use BullMQ for background work (sending messages, executing flows). Define queue in `jobs/queues/`, worker in `jobs/workers/`.
+**Async Jobs**: Use BullMQ for background work (CSV imports, sending messages, executing flows). Define queue in `jobs/queues/`, worker in `jobs/workers/`.
 
 **Validation**: Always validate input with Zod schemas defined in `[module].schema.ts`. Use `schema.parse()` to validate and throw on error.
 
@@ -190,27 +226,46 @@ Verify database state: `npm run prisma:studio` (from backend/)
 ## Environment Variables
 
 ### Backend (.env)
+Create from `.env.example`:
 ```bash
-DATABASE_URL="postgresql://zyva:zyva123@localhost:5432/zyva_db"
+DATABASE_URL="postgresql://thumdra:thumdra123@localhost:5432/thumdra_db"
 REDIS_URL="redis://localhost:6379"
-JWT_SECRET="your-secret-key"
+JWT_SECRET="your-secret-key-change-in-production"
 PORT=3001
 NODE_ENV=development
+
+# Stripe (for billing module)
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+STRIPE_PRICE_PRO="price_..."
+STRIPE_PRICE_BUSINESS="price_..."
+STRIPE_PRICE_ENTERPRISE="price_..."
+
+# Integrations (leave empty until configured)
+WHATSAPP_PHONE_ID=
+WHATSAPP_TOKEN=
+INSTAGRAM_ACCESS_TOKEN=
+RESEND_API_KEY=
+
+FRONTEND_URL="http://localhost:3000"
 ```
 
 ### Frontend (.env.local)
+Create from `.env.local.example`:
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 ```
 
 ## Important Notes
 
-- **Multi-tenancy**: Always scope queries by `organizationId` to prevent data leakage between organizations
-- **Migrations**: Never edit existing migrations. Create new ones with `prisma:migrate`
+- **Multi-tenancy**: Always scope queries by `organizationId` to prevent data leakage between organizations. ADMIN users can see across organizations, LOJA users are scoped to their organization.
+- **Migrations**: Never edit existing migrations. Create new ones with `npm run prisma:migrate` (from backend/)
 - **JWT Secret**: Change default JWT_SECRET in production
-- **Prisma Client**: Run `prisma:generate` after any schema changes to update types
-- **Docker**: Ensure Docker services are running before starting backend (`docker-compose up -d`)
+- **Prisma Client**: Run `npm run prisma:generate` after any schema changes to update types
+- **Docker**: Ensure Docker services are running before starting backend (`docker-compose up -d` from root)
 - **Port conflicts**: Backend uses 3001, Frontend uses 3000, PostgreSQL 5432, Redis 6379
+- **Admin Tools**: pgAdmin (port 5050) and Redis Commander (port 8081) available with `--profile tools`
 
 ## Current Implementation Status
 
@@ -219,26 +274,30 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 - ✅ Backend authentication system (register, login, JWT)
 - ✅ Frontend authentication pages (login, cadastro)
 - ✅ Basic dashboard
-- ✅ Prisma schema with all entities
+- ✅ Contacts CRUD with CSV/Excel import
+- ✅ Tags system for contact segmentation
+- ✅ Stripe billing integration
+- ✅ Admin panel with user management
 - ✅ Multi-tenancy with Organizations
+- ✅ BullMQ worker for async contact imports
 
-**In Progress/TODO** (see doc/ folder for detailed plans):
-- Contacts CRUD (PHASE 2)
-- Kanban pipeline (PHASE 3)
-- Flow builder with visual editor (PHASE 4)
-- WhatsApp/Email/Instagram integrations (PHASE 5-6)
-- Campaign system (PHASE 6)
-- Birthday automation (PHASE 7)
+**In Progress/TODO** (see README.md for detailed roadmap):
+- Kanban pipeline UI
+- Flow builder with visual editor
+- WhatsApp/Email/Instagram integrations
+- Campaign system
+- Birthday automation
 
 ## Additional Documentation
 
-Comprehensive documentation exists in the `doc/` folder:
-- `COMECE_AQUI.md` - Quick start guide
-- `PLANO_DESENVOLVIMENTO.md` - Phase-by-phase implementation plan
+Comprehensive documentation exists in the root directory:
+- `README.md` - Quick start guide and roadmap
 - `ARQUITETURA_TECNICA.md` - Technical architecture details
-- `ESTRUTURA_PROJETO.md` - Complete file structure
 - `ROTAS_E_NAVEGACAO.md` - Route mapping
-- `REDIS_STRUCTURE.md` - Redis data structures
+- `schema.prisma` - Complete database schema
 - `ANALISE_SCHEMA.md` - Database schema analysis
+- `REDIS_STRUCTURE.md` - Redis data structures
+- `PLANO_DESENVOLVIMENTO.md` - Phase-by-phase implementation plan
+- `RESUMO_DECISOES.md` - Technical decisions log
 
-Refer to these documents for detailed implementation guidance for each phase.
+Refer to these documents for detailed implementation guidance.
