@@ -87,11 +87,6 @@ export class ImportService {
                 data: {
                   name: validatedData.name || existing.name,
                   phone: validatedData.phone || existing.phone,
-                  company: validatedData.company,
-                  position: validatedData.position,
-                  city: validatedData.city,
-                  state: validatedData.state,
-                  notes: validatedData.notes,
                 },
               });
               result.success++;
