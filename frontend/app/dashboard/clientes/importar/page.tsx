@@ -14,6 +14,7 @@ import {
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { api } from '@/lib/api';
+import { toast } from '@/lib/toast';
 import { ImportDropzone } from '@/components/contacts/ImportDropzone';
 import { ColumnMapper } from '@/components/contacts/ColumnMapper';
 import { ImportProgress } from '@/components/contacts/ImportProgress';
@@ -83,7 +84,7 @@ export default function ImportContactsPage() {
       setConfig({ ...config, columnMapping: autoMapping });
       setStep('config');
     } catch (error) {
-      alert('Erro ao ler arquivo. Verifique o formato.');
+      toast.error('Erro ao ler arquivo. Verifique o formato.');
     }
   }
 
@@ -156,7 +157,7 @@ export default function ImportContactsPage() {
         setJobId(response.data.jobId);
       }
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Erro ao importar');
+      toast.error(error.response?.data?.message || 'Erro ao importar');
       setProcessing(false);
       setStep('config');
     }
@@ -169,7 +170,7 @@ export default function ImportContactsPage() {
   }
 
   function handleImportError(error: string) {
-    alert(`Erro na importação: ${error}`);
+    toast.error(`Erro na importação: ${error}`);
     setProcessing(false);
     setStep('config');
   }

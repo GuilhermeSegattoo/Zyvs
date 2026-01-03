@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth';
 import { api } from '@/lib/api';
+import { toast } from '@/lib/toast';
 import { motion } from 'framer-motion';
 import { Check, Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -82,7 +83,7 @@ export default function PricingPage() {
       window.location.href = response.data.url;
     } catch (error) {
       console.error('Erro ao criar checkout:', error);
-      alert('Erro ao processar pagamento');
+      toast.error('Erro ao processar pagamento');
     } finally {
       setLoading(null);
     }

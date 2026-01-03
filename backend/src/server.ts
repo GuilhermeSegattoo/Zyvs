@@ -4,10 +4,12 @@ import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
+import rateLimit from '@fastify/rate-limit';
 import { authRoutes } from './modules/auth/auth.routes';
 import { adminRoutes } from './modules/admin/admin.routes';
 import { billingRoutes } from './modules/billing/billing.routes';
 import { contactsRoutes } from './modules/contacts/contacts.routes';
+import { tagsRoutes, contactTagsRoutes } from './modules/tags/tags.routes';
 import { contactImportWorker } from './jobs/workers/contact-import.worker';
 
 const fastify = Fastify({
@@ -24,8 +26,38 @@ fastify.register(cors, {
   allowedHeaders: ['Content-Type', 'Authorization'],
 });
 
+// Rate Limiting - proteção contra ataques de força bruta e DDoS
+fastify.register(rateLimit, {
+  max: 100, // máximo de requisições
+  timeWindow: '1 minute', // janela de tempo
+  errorResponseBuilder: () => ({
+    statusCode: 429,
+    error: 'Too Many Requests',
+    message: 'Muitas requisições. Por favor, aguarde um momento antes de tentar novamente.',
+  }),
+  // Rate limits específicos por rota podem ser configurados nos routes
+  keyGenerator: (request) => {
+    // Usa o IP do cliente ou o userId se autenticado
+    return request.user?.userId || request.ip;
+  },
+});
+
+// Helmet com CSP configurado
 fastify.register(helmet, {
-  contentSecurityPolicy: false, // Desabilitar para desenvolvimento
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://js.stripe.com"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", "https://api.stripe.com", process.env.FRONTEND_URL || ''],
+      frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com"],
+      fontSrc: ["'self'", "https:", "data:"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  } : false, // Desabilitar em desenvolvimento para facilitar debug
+  crossOriginEmbedderPolicy: false, // Necessário para Stripe
 });
 
 fastify.register(jwt, {
@@ -55,6 +87,8 @@ fastify.register(authRoutes, { prefix: '/api/auth' });
 fastify.register(adminRoutes, { prefix: '/api/admin' });
 fastify.register(billingRoutes, { prefix: '/api/billing' });
 fastify.register(contactsRoutes, { prefix: '/api/contacts' });
+fastify.register(tagsRoutes, { prefix: '/api/tags' });
+fastify.register(contactTagsRoutes, { prefix: '/api/contacts' });
 
 // Health check
 fastify.get('/health', async () => {

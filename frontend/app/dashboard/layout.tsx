@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth';
 import { useState, useEffect } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -210,7 +211,11 @@ export default function DashboardLayout({
         </div>
 
         {/* Page content */}
-        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+        <main className="min-h-[calc(100vh-4rem)]">
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
+        </main>
       </div>
     </div>
   );

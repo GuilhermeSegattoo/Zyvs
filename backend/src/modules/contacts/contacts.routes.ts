@@ -9,11 +9,15 @@ import {
   createContact,
   updateContact,
   deleteContact,
+  exportContacts,
 } from './contacts.controller';
 
 export async function contactsRoutes(fastify: FastifyInstance) {
   // Download de template CSV (público - não requer autenticação)
   fastify.get('/template', downloadTemplate);
+
+  // Exportar contatos (requer autenticação)
+  fastify.get('/export', { preHandler: authenticate }, exportContacts);
 
   // CRUD de contatos (requer autenticação)
   fastify.get('/', { preHandler: authenticate }, listContacts);

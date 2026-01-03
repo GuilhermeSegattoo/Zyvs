@@ -1,14 +1,15 @@
 import { z } from 'zod';
+import { emailSchema, passwordSchema, nameSchema } from '../../lib/validators';
 
 export const registerSchema = z.object({
-  name: z.string().min(3, 'Nome deve ter no mínimo 3 caracteres'),
-  email: z.string().email('Email inválido'),
-  password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
+  name: nameSchema,
+  email: emailSchema,
+  password: passwordSchema,
   plan: z.enum(['TESTE_A', 'TESTE_B', 'TESTE_C']),
 });
 
 export const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: emailSchema,
   password: z.string().min(1, 'Senha é obrigatória'),
 });
 

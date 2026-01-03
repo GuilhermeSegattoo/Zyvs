@@ -1,10 +1,11 @@
 import { z } from 'zod';
+import { emailSchema, phoneSchema, paginationWithSearchSchema } from '../../lib/validators';
 
 // Schema para um contato individual
 export const contactSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório').optional(),
-  email: z.string().email('Email inválido').optional(),
-  phone: z.string().optional(),
+  email: emailSchema.optional(),
+  phone: phoneSchema,
   company: z.string().optional(),
   position: z.string().optional(),
   city: z.string().optional(),
@@ -15,6 +16,9 @@ export const contactSchema = z.object({
   (data) => data.name || data.email,
   { message: 'Pelo menos nome ou email deve ser fornecido' }
 );
+
+// Schema para listagem de contatos com paginação e busca
+export const listContactsSchema = paginationWithSearchSchema;
 
 // Schema para configurações de importação
 export const importConfigSchema = z.object({

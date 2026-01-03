@@ -24,6 +24,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { toast } from '@/lib/toast';
 
 interface User {
   id: string;
@@ -120,11 +121,11 @@ export default function AdminUsersPage() {
     try {
       setActionLoading(true);
       await api.patch(`/api/admin/users/${userId}/role`, { role: newRole });
-      alert('Role atualizada com sucesso!');
+      toast.success('Role atualizada com sucesso!');
       loadUsers();
       setSelectedUser(null);
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Erro ao atualizar role');
+      toast.error(error.response?.data?.message || 'Erro ao atualizar role');
     } finally {
       setActionLoading(false);
     }
@@ -133,7 +134,7 @@ export default function AdminUsersPage() {
   const handleResetPassword = async () => {
     if (!selectedUser) return;
     if (newPassword.length < 6) {
-      alert('A senha deve ter pelo menos 6 caracteres');
+      toast.warning('A senha deve ter pelo menos 6 caracteres');
       return;
     }
 
@@ -142,11 +143,11 @@ export default function AdminUsersPage() {
       await api.post(`/api/admin/users/${selectedUser.id}/reset-password`, {
         newPassword,
       });
-      alert('Senha resetada com sucesso!');
+      toast.success('Senha resetada com sucesso!');
       setShowResetPassword(false);
       setNewPassword('');
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Erro ao resetar senha');
+      toast.error(error.response?.data?.message || 'Erro ao resetar senha');
     } finally {
       setActionLoading(false);
     }

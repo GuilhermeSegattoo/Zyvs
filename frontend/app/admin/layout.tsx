@@ -15,6 +15,7 @@ import {
 import { useAuthStore } from '@/stores/auth';
 import { useRequireAdmin } from '@/hooks/useRequireAdmin';
 import { useState } from 'react';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
@@ -166,7 +167,11 @@ export default function AdminLayout({
         </div>
 
         {/* Page content */}
-        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+        <main className="min-h-[calc(100vh-4rem)]">
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
+        </main>
       </div>
     </div>
   );

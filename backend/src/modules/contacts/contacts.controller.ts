@@ -2,6 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { ImportService } from './import/import.service';
 import { importConfigSchema, contactSchema } from './contacts.schema';
 import { prisma } from '../../lib/prisma';
+import * as XLSX from 'xlsx';
 
 const importService = new ImportService();
 
@@ -362,6 +363,94 @@ export async function deleteContact(req: FastifyRequest, reply: FastifyReply) {
   } catch (error: any) {
     return reply.status(500).send({
       error: 'Erro ao deletar contato',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * GET /api/contacts/export
+ * Exportar contatos para Excel
+ */
+export async function exportContacts(req: FastifyRequest, reply: FastifyReply) {
+  try {
+    const { format = 'xlsx' } = req.query as { format?: 'xlsx' | 'csv' };
+    const organizationId = req.user.organizationId;
+
+    if (!organizationId) {
+      return reply.status(400).send({ error: 'OrganizationId não encontrado' });
+    }
+
+    // Buscar todos os contatos
+    const contacts = await prisma.contact.findMany({
+      where: { organizationId },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        tags: {
+          select: { name: true },
+        },
+      },
+    });
+
+    // Formatar dados para exportação
+    const exportData = contacts.map((contact) => {
+      const customFields = contact.customFields as any || {};
+      return {
+        Nome: contact.name || '',
+        Email: contact.email || '',
+        Telefone: contact.phone || '',
+        Empresa: customFields.company || '',
+        Cargo: customFields.position || '',
+        Cidade: customFields.city || '',
+        Estado: customFields.state || '',
+        Tags: contact.tags.map((t) => t.name).join(', '),
+        Observações: contact.notes || '',
+        Status: contact.status,
+        'Data de Criação': new Date(contact.createdAt).toLocaleDateString('pt-BR'),
+      };
+    });
+
+    // Criar workbook
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Contatos');
+
+    // Ajustar largura das colunas
+    const colWidths = [
+      { wch: 25 }, // Nome
+      { wch: 30 }, // Email
+      { wch: 15 }, // Telefone
+      { wch: 20 }, // Empresa
+      { wch: 20 }, // Cargo
+      { wch: 15 }, // Cidade
+      { wch: 5 },  // Estado
+      { wch: 30 }, // Tags
+      { wch: 40 }, // Observações
+      { wch: 10 }, // Status
+      { wch: 15 }, // Data
+    ];
+    worksheet['!cols'] = colWidths;
+
+    // Gerar buffer
+    const buffer = XLSX.write(workbook, {
+      type: 'buffer',
+      bookType: format === 'csv' ? 'csv' : 'xlsx',
+    });
+
+    // Definir headers
+    const filename = `contatos-${new Date().toISOString().split('T')[0]}.${format}`;
+    const contentType = format === 'csv'
+      ? 'text/csv'
+      : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+    reply.header('Content-Type', contentType);
+    reply.header('Content-Disposition', `attachment; filename="${filename}"`);
+
+    return reply.send(buffer);
+  } catch (error: any) {
+    console.error('Erro ao exportar contatos:', error);
+    return reply.status(500).send({
+      error: 'Erro ao exportar contatos',
       message: error.message,
     });
   }

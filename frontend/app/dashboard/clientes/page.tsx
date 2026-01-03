@@ -19,8 +19,10 @@ import {
   FileDown,
   ChevronDown,
   X,
+  Download,
 } from 'lucide-react';
 import { api } from '@/lib/api';
+import { toast } from '@/lib/toast';
 
 interface Contact {
   id: string;
@@ -104,9 +106,10 @@ export default function ContactsPage() {
 
     try {
       await api.delete(`/api/contacts/${id}`);
+      toast.success('Contato deletado com sucesso');
       loadContacts();
     } catch (error) {
-      alert('Erro ao deletar contato');
+      toast.error('Erro ao deletar contato');
     }
   }
 
@@ -114,7 +117,7 @@ export default function ContactsPage() {
     e.preventDefault();
 
     if (!formData.name && !formData.email) {
-      alert('Preencha pelo menos o nome ou email');
+      toast.warning('Preencha pelo menos o nome ou email');
       return;
     }
 
@@ -132,9 +135,10 @@ export default function ContactsPage() {
         state: '',
         notes: '',
       });
+      toast.success('Contato criado com sucesso');
       loadContacts();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Erro ao salvar contato');
+      toast.error(error.response?.data?.message || 'Erro ao salvar contato');
     } finally {
       setSaving(false);
     }
@@ -142,6 +146,29 @@ export default function ContactsPage() {
 
   function downloadTemplate() {
     window.open(`${process.env.NEXT_PUBLIC_API_URL}/api/contacts/template`, '_blank');
+  }
+
+  async function exportContacts() {
+    try {
+      toast.info('Preparando exportação...');
+      const response = await api.get('/api/contacts/export', {
+        responseType: 'blob',
+      });
+
+      // Criar link de download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `contatos-${new Date().toISOString().split('T')[0]}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      toast.success('Contatos exportados com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao exportar contatos');
+    }
   }
 
   return (
@@ -210,12 +237,26 @@ export default function ContactsPage() {
                         setDropdownOpen(false);
                         downloadTemplate();
                       }}
-                      className="w-full px-4 py-3 text-left hover:bg-gray-50 transition flex items-center gap-3"
+                      className="w-full px-4 py-3 text-left hover:bg-gray-50 transition flex items-center gap-3 border-b border-gray-100"
                     >
                       <FileDown className="w-4 h-4 text-gray-600" strokeWidth={2} />
                       <div>
                         <p className="font-semibold text-sm text-black">Ver arquivo de exemplo</p>
                         <p className="text-xs text-gray-500">Download template CSV</p>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        exportContacts();
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-gray-50 transition flex items-center gap-3"
+                    >
+                      <Download className="w-4 h-4 text-gray-600" strokeWidth={2} />
+                      <div>
+                        <p className="font-semibold text-sm text-black">Exportar contatos</p>
+                        <p className="text-xs text-gray-500">Baixar todos em Excel</p>
                       </div>
                     </button>
                   </motion.div>
