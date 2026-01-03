@@ -17,7 +17,7 @@ const connection = new Redis({
 export const contactImportWorker = new Worker(
   'contact-import',
   async (job) => {
-    const { rows, userId, organizationId, config } = job.data;
+    const { rows, organizationId, config } = job.data;
 
     const result: ImportResult = {
       total: rows.length,

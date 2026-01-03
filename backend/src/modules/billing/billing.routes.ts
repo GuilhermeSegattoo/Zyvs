@@ -14,10 +14,5 @@ export async function billingRoutes(fastify: FastifyInstance) {
   fastify.post('/cancel', { preHandler: [authenticate] }, cancelSubscription);
 
   // Webhook público (sem autenticação)
-  fastify.post('/webhook', {
-    config: {
-      // Desabilitar parsing do body (Stripe precisa do raw body)
-      rawBody: true,
-    },
-  }, handleWebhook);
+  fastify.post('/webhook', handleWebhook);
 }

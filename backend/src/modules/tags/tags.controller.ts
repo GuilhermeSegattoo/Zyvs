@@ -32,7 +32,7 @@ export async function listTags(req: FastifyRequest, reply: FastifyReply) {
     });
 
     return reply.send({
-      tags: tags.map((tag) => ({
+      tags: tags.map((tag: any) => ({
         ...tag,
         contactsCount: tag._count.contacts,
         _count: undefined,

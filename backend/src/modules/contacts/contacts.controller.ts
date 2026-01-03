@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { ImportService } from './import/import.service';
-import { importConfigSchema, contactSchema } from './contacts.schema';
+import { importConfigSchema, contactSchema, updateContactSchema } from './contacts.schema';
 import { prisma } from '../../lib/prisma';
 import * as XLSX from 'xlsx';
 
@@ -57,8 +57,8 @@ export async function importContacts(req: FastifyRequest, reply: FastifyReply) {
     // 4. Processar importação
     const result = await importService.processImport({
       file: data,
-      userId: req.user.userId,
-      organizationId: req.user.organizationId,
+      userId: req.user.userId || '',
+      organizationId: req.user.organizationId || '',
       config,
     });
 
@@ -96,7 +96,7 @@ export async function getImportStatus(req: FastifyRequest, reply: FastifyReply) 
  * GET /api/contacts/template
  * Baixar template CSV de exemplo
  */
-export async function downloadTemplate(req: FastifyRequest, reply: FastifyReply) {
+export async function downloadTemplate(_req: FastifyRequest, reply: FastifyReply) {
   try {
     const path = require('path');
     const fs = require('fs');
@@ -107,10 +107,12 @@ export async function downloadTemplate(req: FastifyRequest, reply: FastifyReply)
       return reply.status(404).send({ error: 'Template não encontrado' });
     }
 
+    const fileStream = fs.createReadStream(templatePath);
+
     reply.header('Content-Type', 'text/csv');
     reply.header('Content-Disposition', 'attachment; filename="template-contatos.csv"');
 
-    return reply.sendFile('template-contatos.csv', path.join(__dirname, '../../../public'));
+    return reply.send(fileStream);
   } catch (error: any) {
     return reply.status(500).send({
       error: 'Erro ao baixar template',
@@ -292,7 +294,7 @@ export async function updateContact(req: FastifyRequest, reply: FastifyReply) {
   try {
     const { id } = req.params as { id: string };
     const organizationId = req.user.organizationId;
-    const data = contactSchema.partial().parse(req.body);
+    const data = updateContactSchema.parse(req.body);
 
     // Verificar se contato existe
     const existing = await prisma.contact.findFirst({
@@ -393,7 +395,7 @@ export async function exportContacts(req: FastifyRequest, reply: FastifyReply) {
     });
 
     // Formatar dados para exportação
-    const exportData = contacts.map((contact) => {
+    const exportData = contacts.map((contact: any) => {
       const customFields = contact.customFields as any || {};
       return {
         Nome: contact.name || '',
@@ -403,7 +405,7 @@ export async function exportContacts(req: FastifyRequest, reply: FastifyReply) {
         Cargo: customFields.position || '',
         Cidade: customFields.city || '',
         Estado: customFields.state || '',
-        Tags: contact.tags.map((t) => t.name).join(', '),
+        Tags: contact.tags.map((t: any) => t.name).join(', '),
         Observações: contact.notes || '',
         Status: contact.status,
         'Data de Criação': new Date(contact.createdAt).toLocaleDateString('pt-BR'),

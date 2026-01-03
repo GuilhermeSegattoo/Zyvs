@@ -7,7 +7,7 @@ const adminService = new AdminService();
  * GET /api/admin/stats
  * Retorna estatísticas globais do sistema
  */
-export async function getStats(req: FastifyRequest, reply: FastifyReply) {
+export async function getStats(_req: FastifyRequest, reply: FastifyReply) {
   try {
     const stats = await adminService.getStats();
     return reply.send(stats);

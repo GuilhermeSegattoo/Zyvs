@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { emailSchema, phoneSchema, paginationWithSearchSchema } from '../../lib/validators';
 
-// Schema para um contato individual
-export const contactSchema = z.object({
+// Schema base para um contato (sem refinement)
+const contactSchemaBase = z.object({
   name: z.string().min(1, 'Nome é obrigatório').optional(),
   email: emailSchema.optional(),
   phone: phoneSchema,
@@ -12,10 +12,16 @@ export const contactSchema = z.object({
   state: z.string().optional(),
   notes: z.string().optional(),
   customFields: z.record(z.any()).optional(),
-}).refine(
+});
+
+// Schema para um contato individual (com validação)
+export const contactSchema = contactSchemaBase.refine(
   (data) => data.name || data.email,
   { message: 'Pelo menos nome ou email deve ser fornecido' }
 );
+
+// Schema para atualização parcial de contato (sem validação obrigatória)
+export const updateContactSchema = contactSchemaBase.partial();
 
 // Schema para listagem de contatos com paginação e busca
 export const listContactsSchema = paginationWithSearchSchema;

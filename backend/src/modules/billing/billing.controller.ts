@@ -77,7 +77,7 @@ export async function handleWebhook(req: FastifyRequest, reply: FastifyReply) {
 
   try {
     const event = stripe.webhooks.constructEvent(
-      req.rawBody as Buffer,
+      (req as any).rawBody as Buffer,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!
     );

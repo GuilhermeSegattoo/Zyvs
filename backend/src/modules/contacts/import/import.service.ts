@@ -3,10 +3,8 @@ import { ImportValidator } from './import.validator';
 import { contactImportQueue } from '../../../jobs/queues/contact-import.queue';
 import { prisma } from '../../../lib/prisma';
 import { ImportConfig, ImportResult } from '../contacts.schema';
-import { ParsedContact } from './import.types';
 
 const SYNC_THRESHOLD = 500;
-const BATCH_SIZE = 100;
 
 export class ImportService {
   private parser = new ImportParser();
@@ -49,7 +47,7 @@ export class ImportService {
    */
   private async processSyncImport(
     rows: any[],
-    userId: string,
+    _userId: string,
     organizationId: string,
     config: ImportConfig
   ): Promise<ImportResult> {

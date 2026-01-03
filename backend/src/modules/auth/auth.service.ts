@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
 import { RegisterInput, LoginInput } from './auth.schema';
 
@@ -17,7 +18,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     // 3. Criar usuário e organização em uma transação
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Criar usuário
       const user = await tx.user.create({
         data: {

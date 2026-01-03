@@ -1,6 +1,6 @@
+import Stripe from 'stripe';
 import { stripe, STRIPE_PRICES } from '../../lib/stripe';
 import { prisma } from '../../lib/prisma';
-import { Plan } from '@prisma/client';
 
 export class BillingService {
   /**
@@ -29,7 +29,7 @@ export class BillingService {
   /**
    * Cria sessão de checkout para upgrade de plano
    */
-  async createCheckoutSession(userId: string, plan: Plan) {
+  async createCheckoutSession(userId: string, plan: string) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -46,7 +46,7 @@ export class BillingService {
     }
 
     // Pegar Price ID do plano
-    const priceId = STRIPE_PRICES[plan];
+    const priceId = STRIPE_PRICES[plan as keyof typeof STRIPE_PRICES];
     if (!priceId) {
       throw new Error('Plano inválido');
     }
@@ -126,7 +126,7 @@ export class BillingService {
   /**
    * Atualiza plano do usuário após pagamento confirmado
    */
-  async updateUserPlan(userId: string, plan: Plan, subscriptionId: string) {
+  async updateUserPlan(userId: string, plan: string, subscriptionId: string) {
     // Definir limites baseado no plano
     const limits = {
       FREE: { maxContacts: 100, maxFlows: 2, maxMessages: 500 },
@@ -145,7 +145,7 @@ export class BillingService {
         plan,
         stripeSubscriptionId: subscriptionId,
         planExpiry: null, // Subscription ativa não expira até cancelar
-        ...limits[plan],
+        ...limits[plan as keyof typeof limits],
       },
     });
   }
@@ -158,7 +158,7 @@ export class BillingService {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.userId;
-        const plan = session.metadata?.plan as Plan;
+        const plan = session.metadata?.plan as string;
         const subscriptionId = session.subscription as string;
 
         if (userId && plan && subscriptionId) {
