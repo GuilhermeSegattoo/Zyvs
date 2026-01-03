@@ -53,13 +53,7 @@ export const contactImportWorker = new Worker(
                   where: { id: existing.id },
                   data: {
                     name: validatedData.name || existing.name,
-                    phone: validatedData.phone || existing.phone,
-                    company: validatedData.company,
-                    position: validatedData.position,
-                    city: validatedData.city,
-                    state: validatedData.state,
-                    notes: validatedData.notes,
-                  },
+                    phone: validatedData.phone || existing.phone,                  },
                 });
                 result.success++;
               } else {
