@@ -142,7 +142,7 @@ export class BillingService {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        plan,
+        plan: plan as any,
         stripeSubscriptionId: subscriptionId,
         planExpiry: null, // Subscription ativa não expira até cancelar
         ...limits[plan as keyof typeof limits],
