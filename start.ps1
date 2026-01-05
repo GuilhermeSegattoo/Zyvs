@@ -110,13 +110,13 @@ while ($elapsed -lt $timeout) {
     $elapsed += 2
 
     # Verificar PostgreSQL
-    $postgresStatus = docker exec zyva-postgres pg_isready -U zyva 2>&1
+    $postgresStatus = docker exec thumdra-postgres pg_isready -U thumdra 2>&1
     if ($LASTEXITCODE -eq 0) {
         $postgresReady = $true
     }
 
     # Verificar Redis
-    $redisStatus = docker exec zyva-redis redis-cli ping 2>&1
+    $redisStatus = docker exec thumdra-redis redis-cli ping 2>&1
     if ($redisStatus -match "PONG") {
         $redisReady = $true
     }
@@ -198,7 +198,7 @@ $envMissing = $false
 if (-not (Test-Path ".\backend\.env")) {
     Write-Warning-Message "Arquivo backend/.env não encontrado!"
     Write-Host "  Crie o arquivo com as seguintes variáveis:" -ForegroundColor Yellow
-    Write-Host "  DATABASE_URL=`"postgresql://zyva:zyva123@localhost:5432/zyva_db`"" -ForegroundColor Yellow
+    Write-Host "  DATABASE_URL=`"postgresql://thumdra:thumdra123@localhost:5432/thumdra_db`"" -ForegroundColor Yellow
     Write-Host "  REDIS_URL=`"redis://localhost:6379`"" -ForegroundColor Yellow
     Write-Host "  JWT_SECRET=`"your-secret-key`"" -ForegroundColor Yellow
     Write-Host "  PORT=3001" -ForegroundColor Yellow

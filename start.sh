@@ -99,12 +99,12 @@ while [ $ELAPSED -lt $TIMEOUT ]; do
     ELAPSED=$((ELAPSED + 2))
 
     # Verificar PostgreSQL
-    if docker exec zyva-postgres pg_isready -U zyva &> /dev/null; then
+    if docker exec thumdra-postgres pg_isready -U thumdra &> /dev/null; then
         POSTGRES_READY=true
     fi
 
     # Verificar Redis
-    if docker exec zyva-redis redis-cli ping 2>&1 | grep -q "PONG"; then
+    if docker exec thumdra-redis redis-cli ping 2>&1 | grep -q "PONG"; then
         REDIS_READY=true
     fi
 
@@ -185,7 +185,7 @@ ENV_MISSING=false
 if [ ! -f "./backend/.env" ]; then
     warning_message "Arquivo backend/.env não encontrado!"
     echo -e "${YELLOW}  Crie o arquivo com as seguintes variáveis:${NC}"
-    echo -e "${YELLOW}  DATABASE_URL=\"postgresql://zyva:zyva123@localhost:5432/zyva_db\"${NC}"
+    echo -e "${YELLOW}  DATABASE_URL=\"postgresql://thumdra:thumdra123@localhost:5432/thumdra_db\"${NC}"
     echo -e "${YELLOW}  REDIS_URL=\"redis://localhost:6379\"${NC}"
     echo -e "${YELLOW}  JWT_SECRET=\"your-secret-key\"${NC}"
     echo -e "${YELLOW}  PORT=3001${NC}"
