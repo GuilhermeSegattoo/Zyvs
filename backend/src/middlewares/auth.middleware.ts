@@ -3,8 +3,25 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 export async function authenticate(req: FastifyRequest, reply: FastifyReply) {
   try {
     await req.jwtVerify();
-  } catch (err) {
-    return reply.status(401).send({ error: 'Não autenticado' });
+  } catch (err: any) {
+    // Padronizar mensagens de erro para o frontend identificar corretamente
+    let errorMessage = 'Token inválido ou expirado';
+
+    // Verificar o tipo específico de erro JWT
+    if (err.message?.includes('expired')) {
+      errorMessage = 'Token expirado';
+    } else if (err.message?.includes('invalid')) {
+      errorMessage = 'Token inválido';
+    } else if (err.message?.includes('malformed')) {
+      errorMessage = 'Token inválido';
+    } else if (!req.headers.authorization) {
+      errorMessage = 'Token não fornecido';
+    }
+
+    return reply.status(401).send({
+      error: errorMessage,
+      message: errorMessage, // Enviar em ambos os campos para compatibilidade
+    });
   }
 }
 
@@ -21,8 +38,24 @@ export async function requireAdmin(req: FastifyRequest, reply: FastifyReply) {
         error: 'Acesso negado. Apenas administradores podem acessar este recurso.',
       });
     }
-  } catch (err) {
-    return reply.status(401).send({ error: 'Não autenticado' });
+  } catch (err: any) {
+    // Padronizar mensagens de erro
+    let errorMessage = 'Token inválido ou expirado';
+
+    if (err.message?.includes('expired')) {
+      errorMessage = 'Token expirado';
+    } else if (err.message?.includes('invalid')) {
+      errorMessage = 'Token inválido';
+    } else if (err.message?.includes('malformed')) {
+      errorMessage = 'Token inválido';
+    } else if (!req.headers.authorization) {
+      errorMessage = 'Token não fornecido';
+    }
+
+    return reply.status(401).send({
+      error: errorMessage,
+      message: errorMessage,
+    });
   }
 }
 
