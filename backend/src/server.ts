@@ -10,7 +10,7 @@ import { adminRoutes } from './modules/admin/admin.routes';
 import { billingRoutes } from './modules/billing/billing.routes';
 import { contactsRoutes } from './modules/contacts/contacts.routes';
 import { tagsRoutes, contactTagsRoutes } from './modules/tags/tags.routes';
-import { contactImportWorker } from './jobs/workers/contact-import.worker';
+// import { contactImportWorker } from './jobs/workers/contact-import.worker';
 
 const fastify = Fastify({
   logger: process.env.NODE_ENV === 'development',
@@ -140,7 +140,7 @@ const closeGracefully = async (signal: string) => {
   console.log(`\nReceived signal ${signal}, closing server gracefully...`);
 
   // Fechar worker BullMQ
-  await contactImportWorker.close();
+  // await contactImportWorker.close();
 
   await fastify.close();
   process.exit(0);
