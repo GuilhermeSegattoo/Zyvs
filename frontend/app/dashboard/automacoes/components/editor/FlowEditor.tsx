@@ -85,7 +85,7 @@ export function FlowEditor({ flowId }: FlowEditorProps) {
 
       const data = {
         name,
-        description: description || null,
+        description: description || undefined,
         nodes,
         edges,
       };

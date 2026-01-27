@@ -111,8 +111,8 @@ export const flowEdgeSchema = z.object({
 // Create flow schema
 export const createFlowSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório').max(100),
-  description: z.string().max(500).optional(),
-  category: z.string().max(50).optional(),
+  description: z.string().max(500).nullable().optional(),
+  category: z.string().max(50).nullable().optional(),
   nodes: z.array(flowNodeSchema).default([]),
   edges: z.array(flowEdgeSchema).default([]),
 });
@@ -120,8 +120,8 @@ export const createFlowSchema = z.object({
 // Update flow schema
 export const updateFlowSchema = z.object({
   name: z.string().min(1).max(100).optional(),
-  description: z.string().max(500).optional(),
-  category: z.string().max(50).optional(),
+  description: z.string().max(500).nullable().optional(),
+  category: z.string().max(50).nullable().optional(),
   nodes: z.array(flowNodeSchema).optional(),
   edges: z.array(flowEdgeSchema).optional(),
 });
