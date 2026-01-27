@@ -15,6 +15,7 @@ import {
 import { api } from '@/lib/api';
 import { toast } from '@/lib/toast';
 import { FlowListView } from './FlowListView';
+import { FlowCanvasView } from './canvas';
 import { TestFlowModal } from './TestFlowModal';
 import type { Flow, FlowNode, FlowEdge } from './types';
 
@@ -58,7 +59,7 @@ export function FlowEditor({ flowId }: FlowEditorProps) {
       setStatus(flow.status);
       setCurrentFlowId(flow.id);
       setExecutionCount(flow.executionCount || 0);
-    } catch (error) {
+    } catch {
       toast.error('Erro ao carregar automação');
       router.push('/dashboard/automacoes');
     } finally {
@@ -105,8 +106,10 @@ export function FlowEditor({ flowId }: FlowEditorProps) {
         );
         toast.success('Automação criada');
       }
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Erro ao salvar';
+    } catch (error: unknown) {
+      const message = error instanceof Error && 'response' in error
+        ? (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Erro ao salvar'
+        : 'Erro ao salvar';
       toast.error(message);
     } finally {
       setSaving(false);
@@ -127,8 +130,10 @@ export function FlowEditor({ flowId }: FlowEditorProps) {
       toast.success(
         newStatus === 'ACTIVE' ? 'Automação ativada' : 'Automação desativada'
       );
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Erro ao alterar status';
+    } catch (error: unknown) {
+      const message = error instanceof Error && 'response' in error
+        ? (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Erro ao alterar status'
+        : 'Erro ao alterar status';
       toast.error(message);
     }
   }
@@ -237,10 +242,13 @@ export function FlowEditor({ flowId }: FlowEditorProps) {
                 <List className="w-4 h-4" />
               </button>
               <button
-                onClick={() => toast.info('Modo Canvas em breve!')}
-                className="p-2 bg-white text-gray-400 cursor-not-allowed"
-                title="Modo Canvas (em breve)"
-                disabled
+                onClick={() => setViewMode('canvas')}
+                className={`p-2 ${
+                  viewMode === 'canvas'
+                    ? 'bg-[#00ff88] text-black'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+                title="Modo Canvas"
               >
                 <LayoutGrid className="w-4 h-4" />
               </button>
@@ -301,7 +309,7 @@ export function FlowEditor({ flowId }: FlowEditorProps) {
       </div>
 
       {/* Editor Content */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className={`flex-1 ${viewMode === 'list' ? 'overflow-auto p-6' : 'overflow-hidden'}`}>
         {viewMode === 'list' && (
           <FlowListView
             nodes={nodes}
@@ -310,6 +318,15 @@ export function FlowEditor({ flowId }: FlowEditorProps) {
             onUpdateNode={handleUpdateNode}
             onDeleteNode={handleDeleteNode}
             onReorderNodes={handleReorderNodes}
+          />
+        )}
+        {viewMode === 'canvas' && (
+          <FlowCanvasView
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={setNodes}
+            onEdgesChange={setEdges}
+            onUpdateNode={handleUpdateNode}
           />
         )}
       </div>

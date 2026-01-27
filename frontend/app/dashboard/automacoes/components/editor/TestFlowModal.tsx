@@ -7,9 +7,6 @@ import {
   Search,
   Loader2,
   CheckCircle2,
-  User,
-  Phone,
-  Mail,
   Clock,
   MessageSquare,
   GitBranch,
@@ -33,7 +30,7 @@ interface TestStep {
   type: string;
   label: string;
   status: string;
-  result: Record<string, any>;
+  result: Record<string, unknown>;
 }
 
 interface TestResult {
@@ -59,7 +56,7 @@ const stepIcons: Record<string, typeof Zap> = {
   tag: Tag,
 };
 
-export function TestFlowModal({ flowId, flowName, onClose }: TestFlowModalProps) {
+export function TestFlowModal({ flowId, onClose }: TestFlowModalProps) {
   const [step, setStep] = useState<'select' | 'result'>('select');
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
@@ -101,8 +98,10 @@ export function TestFlowModal({ flowId, flowName, onClose }: TestFlowModalProps)
       });
       setResult(response.data);
       setStep('result');
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Erro ao testar flow';
+    } catch (error: unknown) {
+      const message = error instanceof Error && 'response' in error
+        ? ((error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Erro ao testar flow')
+        : 'Erro ao testar flow';
       toast.error(message);
     } finally {
       setTesting(false);

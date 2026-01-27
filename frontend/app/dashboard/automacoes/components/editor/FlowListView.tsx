@@ -65,7 +65,6 @@ interface FlowListViewProps {
 
 export function FlowListView({
   nodes,
-  edges,
   onAddNode,
   onUpdateNode,
   onDeleteNode,
