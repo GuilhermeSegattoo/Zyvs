@@ -11,6 +11,8 @@ import { billingRoutes } from './modules/billing/billing.routes';
 import { contactsRoutes } from './modules/contacts/contacts.routes';
 import { tagsRoutes, contactTagsRoutes } from './modules/tags/tags.routes';
 import { settingsRoutes } from './modules/settings/settings.routes';
+import { flowsRoutes, flowExecutionsRoutes } from './modules/flows/flows.routes';
+import { birthdayAutomationRoutes } from './modules/birthday-automation/birthday-automation.routes';
 // import { contactImportWorker } from './jobs/workers/contact-import.worker';
 
 const fastify = Fastify({
@@ -108,6 +110,9 @@ fastify.register(contactsRoutes, { prefix: '/api/contacts' });
 fastify.register(tagsRoutes, { prefix: '/api/tags' });
 fastify.register(contactTagsRoutes, { prefix: '/api/contacts' });
 fastify.register(settingsRoutes, { prefix: '/api/settings' });
+fastify.register(flowsRoutes, { prefix: '/api/flows' });
+fastify.register(flowExecutionsRoutes, { prefix: '/api/flows/executions' });
+fastify.register(birthdayAutomationRoutes, { prefix: '/api/birthday-automation' });
 
 // Health check
 fastify.get('/health', async () => {
