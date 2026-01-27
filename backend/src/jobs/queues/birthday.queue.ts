@@ -13,7 +13,7 @@ export interface BirthdayJobData {
   contactPhone?: string | null;
   contactEmail?: string | null;
   template: string;
-  channel: 'WHATSAPP' | 'EMAIL' | 'SMS';
+  channel: 'WHATSAPP' | 'EMAIL' | 'SMS' | 'INSTAGRAM_DM';
 }
 
 // Queue for individual birthday messages

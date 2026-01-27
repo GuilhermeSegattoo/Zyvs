@@ -16,6 +16,8 @@ import { birthdayAutomationRoutes } from './modules/birthday-automation/birthday
 // Workers (importados para iniciar)
 import { contactImportWorker } from './jobs/workers/contact-import.worker';
 import { flowExecutionWorker, flowDelayWorker } from './jobs/workers/flow-execution.worker';
+import { birthdayMessageWorker } from './jobs/workers/birthday.worker';
+import { birthdaySchedulerWorker, initBirthdayScheduler } from './jobs/schedulers/birthday.scheduler';
 
 const fastify = Fastify({
   logger: process.env.NODE_ENV === 'development',
@@ -143,6 +145,9 @@ const start = async () => {
 
     await fastify.listen({ port, host });
 
+    // Initialize schedulers
+    await initBirthdayScheduler();
+
     console.log(`
 ╔═══════════════════════════════════════════╗
 ║                                           ║
@@ -156,6 +161,10 @@ const start = async () => {
 ║   - Contact Import Worker                 ║
 ║   - Flow Execution Worker                 ║
 ║   - Flow Delay Worker                     ║
+║   - Birthday Message Worker               ║
+║                                           ║
+║   Schedulers:                             ║
+║   - Birthday Cron (hourly)                ║
 ║                                           ║
 ╚═══════════════════════════════════════════╝
     `);
@@ -174,6 +183,8 @@ const closeGracefully = async (signal: string) => {
     contactImportWorker.close(),
     flowExecutionWorker.close(),
     flowDelayWorker.close(),
+    birthdayMessageWorker.close(),
+    birthdaySchedulerWorker.close(),
   ]);
 
   await fastify.close();
