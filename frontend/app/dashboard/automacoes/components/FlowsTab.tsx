@@ -41,7 +41,6 @@ export function FlowsTab() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
   const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
 
   const loadFlows = useCallback(async () => {
@@ -51,7 +50,6 @@ export function FlowsTab() {
         params: { page, limit: 20, search },
       });
       setFlows(response.data.flows);
-      setTotal(response.data.pagination.total);
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error('Erro ao carregar flows:', error);
@@ -82,8 +80,8 @@ export function FlowsTab() {
         newStatus === 'ACTIVE' ? 'Automação ativada' : 'Automação desativada'
       );
       loadFlows();
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Erro ao alterar status';
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Erro ao alterar status';
       toast.error(message);
     }
   }
@@ -93,8 +91,8 @@ export function FlowsTab() {
       await api.post(`/api/flows/${id}/duplicate`);
       toast.success('Automação duplicada com sucesso');
       loadFlows();
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Erro ao duplicar';
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Erro ao duplicar';
       toast.error(message);
     }
   }
@@ -106,8 +104,8 @@ export function FlowsTab() {
       await api.delete(`/api/flows/${id}`);
       toast.success('Automação excluída com sucesso');
       loadFlows();
-    } catch (error: any) {
-      const message = error.response?.data?.error || 'Erro ao excluir';
+    } catch (error: unknown) {
+      const message = (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'Erro ao excluir';
       toast.error(message);
     }
   }

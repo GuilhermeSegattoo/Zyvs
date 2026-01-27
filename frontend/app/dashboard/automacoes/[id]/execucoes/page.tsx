@@ -26,6 +26,14 @@ import {
 import { api } from '@/lib/api';
 import { toast } from '@/lib/toast';
 
+interface ExecutionLogEntry {
+  type: string;
+  label?: string;
+  status: 'success' | 'error';
+  result?: string | Record<string, unknown>;
+  timestamp?: string;
+}
+
 interface Execution {
   id: string;
   status: 'RUNNING' | 'PAUSED' | 'COMPLETED' | 'FAILED';
@@ -33,7 +41,7 @@ interface Execution {
   startedAt: string;
   completedAt: string | null;
   errorMessage: string | null;
-  executionLog: any[];
+  executionLog: ExecutionLogEntry[];
   contact: {
     id: string;
     name: string;
@@ -98,7 +106,6 @@ export default function ExecutionsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
   const [selectedExecution, setSelectedExecution] = useState<Execution | null>(null);
 
   const loadData = useCallback(async () => {
@@ -122,9 +129,8 @@ export default function ExecutionsPage() {
       });
 
       setExecutions(executionsRes.data.executions);
-      setTotal(executionsRes.data.pagination.total);
       setTotalPages(executionsRes.data.pagination.totalPages);
-    } catch (error) {
+    } catch {
       toast.error('Erro ao carregar execuções');
       router.push('/dashboard/automacoes');
     } finally {
@@ -188,7 +194,7 @@ export default function ExecutionsPage() {
           className="flex items-center gap-2 text-gray-600 hover:text-black mb-4 transition"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm font-medium">Voltar para "{flow?.name}"</span>
+          <span className="text-sm font-medium">Voltar para &quot;{flow?.name}&quot;</span>
         </button>
 
         <h1 className="text-3xl font-bold text-black">Histórico de Execuções</h1>
@@ -484,7 +490,7 @@ function ExecutionDetailModal({
               </div>
               <div className="divide-y divide-gray-100">
                 {execution.executionLog && execution.executionLog.length > 0 ? (
-                  execution.executionLog.map((log: any, index: number) => {
+                  execution.executionLog.map((log: ExecutionLogEntry, index: number) => {
                     const Icon = stepIcons[log.type] || Zap;
                     const isSuccess = log.status === 'success';
 

@@ -67,9 +67,10 @@ export function BirthdayTab() {
       ]);
       setConfig(configRes.data);
       setUpcomingBirthdays(upcomingRes.data.contacts || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // If no config exists, create default
-      if (error.response?.status === 404) {
+      const axiosError = error as { response?: { status?: number } };
+      if (axiosError.response?.status === 404) {
         setConfig({
           id: '',
           isEnabled: false,
@@ -105,7 +106,7 @@ export function BirthdayTab() {
         sendAtHour: config.sendAtHour,
       });
       toast.success('Configurações salvas com sucesso');
-    } catch (error) {
+    } catch {
       toast.error('Erro ao salvar configurações');
     } finally {
       setSaving(false);
@@ -190,7 +191,7 @@ export function BirthdayTab() {
                   <button
                     key={option.value}
                     onClick={() =>
-                      setConfig({ ...config, channel: option.value as any })
+                      setConfig({ ...config, channel: option.value as BirthdayConfig['channel'] })
                     }
                     className={`flex items-center gap-2 px-4 py-2.5 border-2 font-semibold text-sm transition ${
                       isSelected
