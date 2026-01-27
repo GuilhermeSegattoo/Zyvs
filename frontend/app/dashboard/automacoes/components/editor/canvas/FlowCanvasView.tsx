@@ -15,12 +15,72 @@ import {
   BackgroundVariant,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { Trash2, Settings, Copy } from 'lucide-react';
 
 import { NodePalette } from './NodePalette';
 import { nodeTypes } from './CustomNodes';
 import { NodeConfigModal } from '../NodeConfigModal';
 import type { FlowNode, FlowEdge, NodeType, NodeData } from '../types';
 import { getDefaultConfig, generateId } from '../types';
+
+// Context Menu Component
+interface ContextMenuProps {
+  x: number;
+  y: number;
+  node: ReactFlowNode;
+  onClose: () => void;
+  onDelete: () => void;
+  onConfigure: () => void;
+  onDuplicate: () => void;
+}
+
+function ContextMenu({ x, y, node, onClose, onDelete, onConfigure, onDuplicate }: ContextMenuProps) {
+  const isTrigger = node.type === 'trigger';
+
+  // Close on click outside
+  useEffect(() => {
+    const handleClick = () => onClose();
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed bg-white border border-gray-200 shadow-lg py-1 z-50 min-w-[160px]"
+      style={{ left: x, top: y }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        onClick={onConfigure}
+        className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2"
+      >
+        <Settings className="w-4 h-4 text-gray-500" />
+        Configurar
+      </button>
+      {!isTrigger && (
+        <button
+          onClick={onDuplicate}
+          className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2"
+        >
+          <Copy className="w-4 h-4 text-gray-500" />
+          Duplicar
+        </button>
+      )}
+      {!isTrigger && (
+        <>
+          <div className="border-t border-gray-200 my-1" />
+          <button
+            onClick={onDelete}
+            className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2"
+          >
+            <Trash2 className="w-4 h-4" />
+            Excluir
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
 
 // Define a custom node type for React Flow
 type ReactFlowNode = {
@@ -112,6 +172,13 @@ function FlowCanvasInternal({
 
   // Config modal state
   const [configModalNode, setConfigModalNode] = useState<FlowNode | null>(null);
+
+  // Context menu state
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    node: ReactFlowNode;
+  } | null>(null);
 
   // Check if trigger exists
   const hasTrigger = nodes.some((n) => n.type === 'trigger');
@@ -208,6 +275,52 @@ function FlowCanvasInternal({
     []
   );
 
+  // Handle right-click on node (context menu)
+  const onNodeContextMenu = useCallback(
+    (event: React.MouseEvent, node: ReactFlowNode) => {
+      event.preventDefault();
+      setContextMenu({
+        x: event.clientX,
+        y: event.clientY,
+        node,
+      });
+    },
+    []
+  );
+
+  // Context menu actions
+  const handleContextMenuDelete = useCallback(() => {
+    if (!contextMenu) return;
+    const nodeId = contextMenu.node.id;
+    setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+    setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
+    setContextMenu(null);
+  }, [contextMenu, setNodes, setEdges]);
+
+  const handleContextMenuConfigure = useCallback(() => {
+    if (!contextMenu) return;
+    setConfigModalNode(toFlowNode(contextMenu.node));
+    setContextMenu(null);
+  }, [contextMenu]);
+
+  const handleContextMenuDuplicate = useCallback(() => {
+    if (!contextMenu) return;
+    const originalNode = contextMenu.node;
+
+    const newNode: ReactFlowNode = {
+      id: generateId(),
+      type: originalNode.type,
+      position: {
+        x: originalNode.position.x + 50,
+        y: originalNode.position.y + 50,
+      },
+      data: { ...originalNode.data },
+    };
+
+    setNodes((nds) => [...nds, newNode]);
+    setContextMenu(null);
+  }, [contextMenu, setNodes]);
+
   // Handle config save
   const handleConfigSave = useCallback(
     (data: NodeData) => {
@@ -280,6 +393,8 @@ function FlowCanvasInternal({
           onEdgesChange={handleEdgesChange}
           onConnect={onConnect}
           onNodeClick={onNodeClick}
+          onNodeContextMenu={onNodeContextMenu}
+          onPaneClick={() => setContextMenu(null)}
           nodeTypes={nodeTypes}
           fitView
           fitViewOptions={{ padding: 0.2 }}
@@ -301,6 +416,19 @@ function FlowCanvasInternal({
           node={configModalNode}
           onSave={handleConfigSave}
           onClose={() => setConfigModalNode(null)}
+        />
+      )}
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          node={contextMenu.node}
+          onClose={() => setContextMenu(null)}
+          onDelete={handleContextMenuDelete}
+          onConfigure={handleContextMenuConfigure}
+          onDuplicate={handleContextMenuDuplicate}
         />
       )}
     </div>

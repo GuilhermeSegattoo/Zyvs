@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { Handle, Position, type NodeProps, useReactFlow } from '@xyflow/react';
 import {
   Zap,
   Clock,
@@ -9,6 +9,7 @@ import {
   GitBranch,
   Columns3,
   Tag,
+  Trash2,
 } from 'lucide-react';
 import type {
   NodeType,
@@ -49,6 +50,7 @@ const nodeLabels: Record<NodeType, string> = {
 // Base node wrapper component
 interface BaseNodeProps {
   type: NodeType;
+  nodeId: string;
   label?: string;
   summary?: string;
   selected?: boolean;
@@ -59,6 +61,7 @@ interface BaseNodeProps {
 
 function BaseNode({
   type,
+  nodeId,
   label,
   summary,
   selected,
@@ -69,15 +72,35 @@ function BaseNode({
   const Icon = nodeIcons[type];
   const color = nodeColors[type];
   const defaultLabel = nodeLabels[type];
+  const { setNodes, setEdges } = useReactFlow();
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Don't allow deleting trigger node
+    if (type === 'trigger') return;
+
+    setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+    setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
+  };
 
   return (
     <div
       className={`
-        min-w-[160px] max-w-[200px] bg-white border-2 shadow-md transition-shadow
+        min-w-[160px] max-w-[200px] bg-white border-2 shadow-md transition-shadow relative group
         ${selected ? 'shadow-lg ring-2 ring-blue-400' : 'hover:shadow-lg'}
       `}
       style={{ borderColor: color }}
     >
+      {/* Delete button - shows when selected (except for trigger) */}
+      {selected && type !== 'trigger' && (
+        <button
+          onClick={handleDelete}
+          className="absolute -top-3 -right-3 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md transition-colors z-10"
+          title="Excluir node"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      )}
       {/* Target handle (input) */}
       {hasTargetHandle && (
         <Handle
@@ -142,7 +165,7 @@ function BaseNode({
 }
 
 // Trigger Node
-export const TriggerNode = memo(({ data, selected }: NodeProps) => {
+export const TriggerNode = memo(({ id, data, selected }: NodeProps) => {
   const config = data.config as TriggerConfig | undefined;
 
   const getSummary = () => {
@@ -164,6 +187,7 @@ export const TriggerNode = memo(({ data, selected }: NodeProps) => {
   return (
     <BaseNode
       type="trigger"
+      nodeId={id}
       label={data.label as string}
       summary={getSummary()}
       selected={selected}
@@ -174,7 +198,7 @@ export const TriggerNode = memo(({ data, selected }: NodeProps) => {
 TriggerNode.displayName = 'TriggerNode';
 
 // Delay Node
-export const DelayNode = memo(({ data, selected }: NodeProps) => {
+export const DelayNode = memo(({ id, data, selected }: NodeProps) => {
   const config = data.config as DelayConfig | undefined;
 
   const getSummary = () => {
@@ -190,6 +214,7 @@ export const DelayNode = memo(({ data, selected }: NodeProps) => {
   return (
     <BaseNode
       type="delay"
+      nodeId={id}
       label={data.label as string}
       summary={getSummary()}
       selected={selected}
@@ -199,7 +224,7 @@ export const DelayNode = memo(({ data, selected }: NodeProps) => {
 DelayNode.displayName = 'DelayNode';
 
 // Message Node
-export const MessageNode = memo(({ data, selected }: NodeProps) => {
+export const MessageNode = memo(({ id, data, selected }: NodeProps) => {
   const config = data.config as MessageConfig | undefined;
 
   const getSummary = () => {
@@ -213,6 +238,7 @@ export const MessageNode = memo(({ data, selected }: NodeProps) => {
   return (
     <BaseNode
       type="message"
+      nodeId={id}
       label={data.label as string}
       summary={getSummary()}
       selected={selected}
@@ -222,7 +248,7 @@ export const MessageNode = memo(({ data, selected }: NodeProps) => {
 MessageNode.displayName = 'MessageNode';
 
 // Condition Node (has two outputs: yes/no)
-export const ConditionNode = memo(({ data, selected }: NodeProps) => {
+export const ConditionNode = memo(({ id, data, selected }: NodeProps) => {
   const config = data.config as ConditionConfig | undefined;
 
   const getSummary = () => {
@@ -240,6 +266,7 @@ export const ConditionNode = memo(({ data, selected }: NodeProps) => {
     <div className="relative">
       <BaseNode
         type="condition"
+        nodeId={id}
         label={data.label as string}
         summary={getSummary()}
         selected={selected}
@@ -260,10 +287,11 @@ export const ConditionNode = memo(({ data, selected }: NodeProps) => {
 ConditionNode.displayName = 'ConditionNode';
 
 // Kanban Node
-export const KanbanNode = memo(({ data, selected }: NodeProps) => {
+export const KanbanNode = memo(({ id, data, selected }: NodeProps) => {
   return (
     <BaseNode
       type="kanban"
+      nodeId={id}
       label={data.label as string}
       summary="Mover para coluna"
       selected={selected}
@@ -273,10 +301,11 @@ export const KanbanNode = memo(({ data, selected }: NodeProps) => {
 KanbanNode.displayName = 'KanbanNode';
 
 // Tag Node
-export const TagNode = memo(({ data, selected }: NodeProps) => {
+export const TagNode = memo(({ id, data, selected }: NodeProps) => {
   return (
     <BaseNode
       type="tag"
+      nodeId={id}
       label={data.label as string}
       summary="Adicionar/remover tag"
       selected={selected}
