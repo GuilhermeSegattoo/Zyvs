@@ -13,7 +13,9 @@ import { tagsRoutes, contactTagsRoutes } from './modules/tags/tags.routes';
 import { settingsRoutes } from './modules/settings/settings.routes';
 import { flowsRoutes, flowExecutionsRoutes } from './modules/flows/flows.routes';
 import { birthdayAutomationRoutes } from './modules/birthday-automation/birthday-automation.routes';
-// import { contactImportWorker } from './jobs/workers/contact-import.worker';
+// Workers (importados para iniciar)
+import { contactImportWorker } from './jobs/workers/contact-import.worker';
+import { flowExecutionWorker, flowDelayWorker } from './jobs/workers/flow-execution.worker';
 
 const fastify = Fastify({
   logger: process.env.NODE_ENV === 'development',
@@ -142,16 +144,20 @@ const start = async () => {
     await fastify.listen({ port, host });
 
     console.log(`
-╔═══════════════════════════════════════╗
-║                                       ║
-║   🚀 Zyva API Server                  ║
-║                                       ║
-║   Server:  http://localhost:${port}      ║
-║   Health:  http://localhost:${port}/health ║
-║   Env:     ${process.env.NODE_ENV}              ║
-║   Worker:  ✅ Contact Import Worker   ║
-║                                       ║
-╚═══════════════════════════════════════╝
+╔═══════════════════════════════════════════╗
+║                                           ║
+║   Zyva API Server                         ║
+║                                           ║
+║   Server:  http://localhost:${port}          ║
+║   Health:  http://localhost:${port}/health     ║
+║   Env:     ${process.env.NODE_ENV || 'development'}                      ║
+║                                           ║
+║   Workers:                                ║
+║   - Contact Import Worker                 ║
+║   - Flow Execution Worker                 ║
+║   - Flow Delay Worker                     ║
+║                                           ║
+╚═══════════════════════════════════════════╝
     `);
   } catch (err) {
     fastify.log.error(err);
@@ -163,8 +169,12 @@ const start = async () => {
 const closeGracefully = async (signal: string) => {
   console.log(`\nReceived signal ${signal}, closing server gracefully...`);
 
-  // Fechar worker BullMQ
-  // await contactImportWorker.close();
+  // Fechar workers BullMQ
+  await Promise.all([
+    contactImportWorker.close(),
+    flowExecutionWorker.close(),
+    flowDelayWorker.close(),
+  ]);
 
   await fastify.close();
   process.exit(0);
