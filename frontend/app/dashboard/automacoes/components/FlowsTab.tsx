@@ -65,8 +65,11 @@ export function FlowsTab() {
 
   // Close action menu when clicking outside
   useEffect(() => {
-    function handleClickOutside() {
-      setActionMenuOpen(null);
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      if (!target.closest('[data-action-menu]')) {
+        setActionMenuOpen(null);
+      }
     }
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
@@ -277,7 +280,7 @@ export function FlowsTab() {
                       Editar
                     </button>
 
-                    <div className="relative">
+                    <div className="relative" data-action-menu>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -293,7 +296,6 @@ export function FlowsTab() {
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
                           className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 shadow-lg z-10"
-                          onClick={(e) => e.stopPropagation()}
                         >
                           <button
                             onClick={() => {
