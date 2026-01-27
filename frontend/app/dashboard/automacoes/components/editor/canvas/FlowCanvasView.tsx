@@ -261,20 +261,24 @@ function FlowCanvasInternal({
   }, []);
 
   return (
-    <div className="flex h-full" onKeyDown={onKeyDown} tabIndex={0}>
+    <div className="flex w-full h-full" style={{ height: '100%' }} onKeyDown={onKeyDown} tabIndex={0}>
       {/* Sidebar Palette */}
       <NodePalette hasTrigger={hasTrigger} />
 
       {/* Canvas */}
-      <div className="flex-1 h-full" ref={reactFlowWrapper}>
+      <div
+        className="flex-1 relative"
+        ref={reactFlowWrapper}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        style={{ height: '100%' }}
+      >
         <ReactFlow
           nodes={nodes}
           edges={edges}
           onNodesChange={handleNodesChange}
           onEdgesChange={handleEdgesChange}
           onConnect={onConnect}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
           onNodeClick={onNodeClick}
           nodeTypes={nodeTypes}
           fitView
