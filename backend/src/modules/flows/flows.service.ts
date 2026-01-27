@@ -184,7 +184,8 @@ export class FlowsService {
   async updateStatus(
     id: string,
     organizationId: string,
-    data: UpdateStatusInput
+    data: UpdateStatusInput,
+    validateNodes?: (nodes: FlowNode[]) => string[]
   ) {
     // Check if flow exists
     const existing = await prisma.flow.findFirst({
@@ -205,6 +206,14 @@ export class FlowsService {
       const hasTrigger = nodes.some((node) => node.type === 'trigger');
       if (!hasTrigger) {
         throw new Error('Flow precisa ter um gatilho para ser ativado');
+      }
+
+      // Strict validation for all nodes
+      if (validateNodes) {
+        const validationErrors = validateNodes(nodes);
+        if (validationErrors.length > 0) {
+          throw new Error(`Configuração incompleta: ${validationErrors[0]}`);
+        }
       }
     }
 

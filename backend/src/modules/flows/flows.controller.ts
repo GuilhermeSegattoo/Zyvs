@@ -1,4 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
+import { ZodError } from 'zod';
 import { FlowsService } from './flows.service';
 import {
   createFlowSchema,
@@ -6,7 +7,33 @@ import {
   updateStatusSchema,
   listFlowsQuerySchema,
   testFlowSchema,
+  validateNodesForActivation,
 } from './flows.schema';
+
+/**
+ * Safely formats error for logging (handles Zod errors and circular references)
+ */
+function formatErrorForLog(error: unknown): string {
+  if (error instanceof ZodError) {
+    return `ZodError: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`;
+  }
+  if (error instanceof Error) {
+    return `${error.name}: ${error.message}`;
+  }
+  return String(error);
+}
+
+/**
+ * Gets user-friendly error message from Zod validation errors
+ */
+function getZodErrorMessage(error: ZodError): string {
+  const firstError = error.errors[0];
+  if (firstError) {
+    const path = firstError.path.join(' > ');
+    return path ? `${path}: ${firstError.message}` : firstError.message;
+  }
+  return 'Dados inválidos';
+}
 
 const flowsService = new FlowsService();
 
@@ -78,15 +105,26 @@ export async function createFlow(req: FastifyRequest, reply: FastifyReply) {
     const flow = await flowsService.createFlow(organizationId, userId, data);
 
     return reply.status(201).send(flow);
-  } catch (error: any) {
-    if (error.message.includes('Limite de flows')) {
-      return reply.status(403).send({ error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
+      console.error('Erro de validação ao criar flow:', formatErrorForLog(error));
+      return reply.status(400).send({
+        error: 'Dados inválidos',
+        message: getZodErrorMessage(error),
+      });
     }
-    console.error('Erro ao criar flow:', error);
-    return reply.status(500).send({
-      error: 'Erro ao criar flow',
-      message: error.message,
-    });
+    if (error instanceof Error) {
+      if (error.message.includes('Limite de flows')) {
+        return reply.status(403).send({ error: error.message });
+      }
+      console.error('Erro ao criar flow:', formatErrorForLog(error));
+      return reply.status(500).send({
+        error: 'Erro ao criar flow',
+        message: error.message,
+      });
+    }
+    console.error('Erro desconhecido ao criar flow:', String(error));
+    return reply.status(500).send({ error: 'Erro interno ao criar flow' });
   }
 }
 
@@ -107,14 +145,26 @@ export async function updateFlow(req: FastifyRequest, reply: FastifyReply) {
     const flow = await flowsService.updateFlow(id, organizationId, data);
 
     return reply.send(flow);
-  } catch (error: any) {
-    if (error.message === 'Flow não encontrado') {
-      return reply.status(404).send({ error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
+      console.error('Erro de validação ao atualizar flow:', formatErrorForLog(error));
+      return reply.status(400).send({
+        error: 'Dados inválidos',
+        message: getZodErrorMessage(error),
+      });
     }
-    return reply.status(500).send({
-      error: 'Erro ao atualizar flow',
-      message: error.message,
-    });
+    if (error instanceof Error) {
+      if (error.message === 'Flow não encontrado') {
+        return reply.status(404).send({ error: error.message });
+      }
+      console.error('Erro ao atualizar flow:', formatErrorForLog(error));
+      return reply.status(500).send({
+        error: 'Erro ao atualizar flow',
+        message: error.message,
+      });
+    }
+    console.error('Erro desconhecido ao atualizar flow:', String(error));
+    return reply.status(500).send({ error: 'Erro interno ao atualizar flow' });
   }
 }
 
@@ -135,23 +185,41 @@ export async function updateFlowStatus(
     }
 
     const data = updateStatusSchema.parse(req.body);
-    const flow = await flowsService.updateStatus(id, organizationId, data);
+    const flow = await flowsService.updateStatus(
+      id,
+      organizationId,
+      data,
+      validateNodesForActivation
+    );
 
     return reply.send(flow);
-  } catch (error: any) {
-    if (error.message === 'Flow não encontrado') {
-      return reply.status(404).send({ error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof ZodError) {
+      console.error('Erro de validação ao atualizar status:', formatErrorForLog(error));
+      return reply.status(400).send({
+        error: 'Dados inválidos',
+        message: getZodErrorMessage(error),
+      });
     }
-    if (
-      error.message.includes('precisa ter') ||
-      error.message.includes('gatilho')
-    ) {
-      return reply.status(400).send({ error: error.message });
+    if (error instanceof Error) {
+      if (error.message === 'Flow não encontrado') {
+        return reply.status(404).send({ error: error.message });
+      }
+      if (
+        error.message.includes('precisa ter') ||
+        error.message.includes('gatilho') ||
+        error.message.includes('Configuração incompleta')
+      ) {
+        return reply.status(400).send({ error: error.message });
+      }
+      console.error('Erro ao atualizar status:', formatErrorForLog(error));
+      return reply.status(500).send({
+        error: 'Erro ao atualizar status',
+        message: error.message,
+      });
     }
-    return reply.status(500).send({
-      error: 'Erro ao atualizar status',
-      message: error.message,
-    });
+    console.error('Erro desconhecido ao atualizar status:', String(error));
+    return reply.status(500).send({ error: 'Erro interno ao atualizar status' });
   }
 }
 

@@ -23,29 +23,54 @@ export const delayConfigSchema = z.object({
   unit: z.enum(['minutes', 'hours', 'days']),
 });
 
-// Message configuration
+// Message configuration (permissive for draft, validated on activation)
 export const messageConfigSchema = z.object({
   channel: z.enum(['WHATSAPP', 'EMAIL', 'SMS']),
-  content: z.string().min(1),
+  content: z.string(),
   mediaUrl: z.string().optional(),
 });
 
-// Condition configuration
+// Strict version for activation validation
+export const messageConfigStrictSchema = z.object({
+  channel: z.enum(['WHATSAPP', 'EMAIL', 'SMS']),
+  content: z.string().min(1, 'Conteúdo da mensagem é obrigatório'),
+  mediaUrl: z.string().optional(),
+});
+
+// Condition configuration (permissive for draft)
 export const conditionConfigSchema = z.object({
-  field: z.string().min(1),
+  field: z.string(),
   operator: z.enum(['equals', 'not_equals', 'contains', 'has_tag']),
   value: z.string(),
 });
 
-// Kanban configuration
-export const kanbanConfigSchema = z.object({
-  columnId: z.string().min(1),
+// Strict version for activation
+export const conditionConfigStrictSchema = z.object({
+  field: z.string().min(1, 'Campo da condição é obrigatório'),
+  operator: z.enum(['equals', 'not_equals', 'contains', 'has_tag']),
+  value: z.string(),
 });
 
-// Tag configuration
+// Kanban configuration (permissive for draft)
+export const kanbanConfigSchema = z.object({
+  columnId: z.string(),
+});
+
+// Strict version for activation
+export const kanbanConfigStrictSchema = z.object({
+  columnId: z.string().min(1, 'Coluna do pipeline é obrigatória'),
+});
+
+// Tag configuration (permissive for draft)
 export const tagConfigSchema = z.object({
   action: z.enum(['add', 'remove']),
-  tagId: z.string().min(1),
+  tagId: z.string(),
+});
+
+// Strict version for activation
+export const tagConfigStrictSchema = z.object({
+  action: z.enum(['add', 'remove']),
+  tagId: z.string().min(1, 'Tag é obrigatória'),
 });
 
 // Node data schema
@@ -128,3 +153,73 @@ export type ListFlowsQuery = z.infer<typeof listFlowsQuerySchema>;
 export type TestFlowInput = z.infer<typeof testFlowSchema>;
 export type FlowNode = z.infer<typeof flowNodeSchema>;
 export type FlowEdge = z.infer<typeof flowEdgeSchema>;
+
+/**
+ * Validates nodes strictly for flow activation
+ * Returns array of validation errors or empty array if valid
+ */
+export function validateNodesForActivation(nodes: FlowNode[]): string[] {
+  const errors: string[] = [];
+
+  for (const node of nodes) {
+    const config = node.data.config as Record<string, unknown>;
+
+    switch (node.type) {
+      case 'trigger': {
+        const result = triggerConfigSchema.safeParse(config);
+        if (!result.success) {
+          errors.push(`Gatilho "${node.data.label}": configuração inválida`);
+        }
+        // Additional validation for trigger types that need extra fields
+        if (config.triggerType === 'tag_added' || config.triggerType === 'tag_removed') {
+          if (!config.tagId) {
+            errors.push(`Gatilho "${node.data.label}": selecione uma tag`);
+          }
+        }
+        if (config.triggerType === 'date_field') {
+          if (!config.dateField) {
+            errors.push(`Gatilho "${node.data.label}": selecione um campo de data`);
+          }
+        }
+        break;
+      }
+      case 'delay': {
+        const result = delayConfigSchema.safeParse(config);
+        if (!result.success) {
+          errors.push(`Aguardar "${node.data.label}": tempo deve ser maior que 0`);
+        }
+        break;
+      }
+      case 'message': {
+        const result = messageConfigStrictSchema.safeParse(config);
+        if (!result.success) {
+          errors.push(`Mensagem "${node.data.label}": conteúdo é obrigatório`);
+        }
+        break;
+      }
+      case 'condition': {
+        const result = conditionConfigStrictSchema.safeParse(config);
+        if (!result.success) {
+          errors.push(`Condição "${node.data.label}": campo é obrigatório`);
+        }
+        break;
+      }
+      case 'kanban': {
+        const result = kanbanConfigStrictSchema.safeParse(config);
+        if (!result.success) {
+          errors.push(`Pipeline "${node.data.label}": selecione uma coluna`);
+        }
+        break;
+      }
+      case 'tag': {
+        const result = tagConfigStrictSchema.safeParse(config);
+        if (!result.success) {
+          errors.push(`Tag "${node.data.label}": selecione uma tag`);
+        }
+        break;
+      }
+    }
+  }
+
+  return errors;
+}
