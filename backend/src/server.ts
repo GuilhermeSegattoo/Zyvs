@@ -13,6 +13,7 @@ import { tagsRoutes, contactTagsRoutes } from './modules/tags/tags.routes';
 import { settingsRoutes } from './modules/settings/settings.routes';
 import { flowsRoutes, flowExecutionsRoutes } from './modules/flows/flows.routes';
 import { birthdayAutomationRoutes } from './modules/birthday-automation/birthday-automation.routes';
+import { kanbanRoutes } from './modules/kanban/kanban.routes';
 // Workers (importados para iniciar)
 import { contactImportWorker } from './jobs/workers/contact-import.worker';
 import { flowExecutionWorker, flowDelayWorker } from './jobs/workers/flow-execution.worker';
@@ -117,6 +118,7 @@ fastify.register(settingsRoutes, { prefix: '/api/settings' });
 fastify.register(flowsRoutes, { prefix: '/api/flows' });
 fastify.register(flowExecutionsRoutes, { prefix: '/api/flows/executions' });
 fastify.register(birthdayAutomationRoutes, { prefix: '/api/birthday-automation' });
+fastify.register(kanbanRoutes, { prefix: '/api/kanban' });
 
 // Health check
 fastify.get('/health', async () => {
